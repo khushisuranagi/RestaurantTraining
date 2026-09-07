@@ -1,0 +1,148 @@
+@page "/people"
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.PeopleManagement
+@inject IPeopleService PeopleService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>People</PageTitle>
+
+<div class="people-page">
+
+    <div class="people-header">
+        <div>
+            <p class="eyebrow">CONTENT MANAGEMENT</p>
+            <h1>People</h1>
+            <p>Users grouped by role, and the modules assigned to each role.</p>
+        </div>
+        <div class="people-summary">
+            <span><strong>@TotalUsers</strong> users</span>
+            <span><strong>@groups.Count</strong> roles</span>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input type="text" placeholder="Search by name, email or role..."
+               @bind="search" @bind:event="oninput" />
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">Loading people...</div>
+    }
+    else
+    {
+        var anyVisible = false;
+
+        @foreach (var g in groups)
+        {
+            var users = FilterUsers(g);
+            @if (ShowGroup(g, users))
+            {
+                anyVisible = true;
+
+                <div class="role-card">
+                    <div class="role-head">
+                        <h2>@g.RoleName</h2>
+                        <span class="role-counts">@g.Users.Count user(s) · @g.Modules.Count module(s)</span>
+                    </div>
+
+                    <div class="role-modules">
+                        <span class="label">Assigned modules:</span>
+                        @if (g.Modules.Count == 0)
+                        {
+                            <span class="none">None assigned</span>
+                        }
+                        else
+                        {
+                            @foreach (var m in g.Modules)
+                            {
+                                <span class="module-chip">@m.ModuleName</span>
+                            }
+                        }
+                    </div>
+
+                    <div class="role-users">
+                        @if (users.Count == 0)
+                        {
+                            <p class="none">No users in this role.</p>
+                        }
+                        else
+                        {
+                            @foreach (var u in users)
+                            {
+                                <div class="user-row">
+                                    <span class="user-avatar">@Initials(u.FullName)</span>
+                                    <div class="user-main">
+                                        <strong>@u.FullName</strong>
+                                        <small>@u.Email</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+        @if (!anyVisible)
+        {
+            <div class="empty-state"><h3>No matches</h3><p>Try a different name, email or role.</p></div>
+        }
+    }
+
+</div>
+
+@code {
+    private List<PeopleRoleGroup> groups = [];
+    private bool isLoading = true;
+    private string search = string.Empty;
+
+    private int TotalUsers => groups.Sum(g => g.Users.Count);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role != "Content Creator")
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+        try { groups = await PeopleService.GetPeopleAsync(); }
+        finally { isLoading = false; }
+    }
+
+    // users to show for a group given the current search.
+    private List<PeopleUser> FilterUsers(PeopleRoleGroup g)
+    {
+        if (string.IsNullOrWhiteSpace(search)) return g.Users;
+
+        var q = search.Trim();
+
+        // if the role name matches show all its users
+        if (g.RoleName.Contains(q, StringComparison.OrdinalIgnoreCase))
+            return g.Users;
+
+        return g.Users
+            .Where(u => u.FullName.Contains(q, StringComparison.OrdinalIgnoreCase)
+                     || u.Email.Contains(q, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private bool ShowGroup(PeopleRoleGroup g, List<PeopleUser> users)
+    {
+        if (string.IsNullOrWhiteSpace(search)) return true;
+        var q = search.Trim();
+        return g.RoleName.Contains(q, StringComparison.OrdinalIgnoreCase) || users.Count > 0;
+    }
+
+    private static string Initials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        return string.Concat(name
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(w => char.ToUpperInvariant(w[0])));
+    }
+}

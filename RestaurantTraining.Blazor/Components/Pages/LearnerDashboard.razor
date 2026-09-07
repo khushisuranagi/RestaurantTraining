@@ -1,0 +1,103 @@
+﻿@page "/learner-dashboard"
+
+@using RestaurantTraining.Blazor.Services
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="learner-page">
+
+    @if (isLoading)
+    {
+        <div class="loading-state">Loading your dashboard...</div>
+    }
+    else
+    {
+        @* ---- Welcome banner ---- *@
+        <div class="welcome-banner">
+            <div>
+                <p class="welcome-hi">Welcome back!</p>
+                <h1>@AuthState.FullName</h1>
+               
+            </div>
+            <button class="continue-btn" @onclick="ContinueLearning">
+                Continue Learning →
+            </button>
+        </div>
+
+        @* ---- Stat cards ---- *@
+        <h2 class="stat-progress">Your Progress</h2>
+
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <span class="stat-icon">📘</span>
+                <strong>@(dashboard?.ModulesCompleted ?? 0)</strong>
+                <span class="stat-label">Modules Completed</span>
+                <small>of @(dashboard?.TotalModules ?? 0) total</small>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <strong>@(dashboard?.QuizzesAttempted ?? 0)</strong>
+                <span class="stat-label">Quizzes Attempted</span>
+                <small>of @(dashboard?.TotalQuizzes ?? 0) total</small>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">🏅</span>
+                <strong>@(dashboard?.CertificatesEarned ?? 0)</strong>
+                <span class="stat-label">Certificates</span>
+                <small>@(dashboard?.CertificatesPending ?? 0) pending</small>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">⚡</span>
+                <strong>@(dashboard?.AiScenariosCompleted ?? 0)</strong>
+                <span class="stat-label">AI Scenarios</span>
+                <small>Completed</small>
+            </div>
+
+        </div>
+
+        @* ---- Pending modules (started but not finished) ---- *@
+        <div class="modules-panel">
+            <div class="panel-head">
+                <h2>Pending Modules</h2>
+                <a class="view-all" href="/learning-modules">View all</a>
+            </div>
+
+            @if (dashboard == null || dashboard.PendingModules.Count == 0)
+            {
+                <div class="start-cta">
+                    <div class="start-cta-text">
+                        <strong>Start learning today</strong>
+                        <p>You have no modules in progress. Pick one and begin your training.</p>
+                    </div>
+                    <button class="start-cta-btn" @onclick='() => Navigation.NavigateTo("/learning-modules")'>
+                        Browse modules →
+                    </button>
+                </div>
+            }
+            else
+            {
+                @foreach (var m in dashboard.PendingModules)
+                {
+                    <div class="module-row" @onclick="() => OpenModule(m.ModuleId)">
+                        <span class="module-thumb">📖</span>
+
+                        <div class="module-main">
+                            <h3>@m.ModuleName</h3>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width:@(m.ProgressPercent)%"></div>
+                            </div>
+                        </div>
+
+                        <span class="module-percent">@m.ProgressPercent% Complete</span>
+                        <span class="module-arrow">→</span>
+                    </div>
+                }
+            }
+        </div>
+    }
+
+</div>

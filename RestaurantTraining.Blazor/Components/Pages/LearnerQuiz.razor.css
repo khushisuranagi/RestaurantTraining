@@ -1,0 +1,76 @@
+.learner-quiz-page { padding: 24px 40px 40px; color:#172033; }
+.eyebrow { color:#1c39bb; font-size:.8rem; font-weight:700; letter-spacing:.12em; margin:0; }
+.learner-quiz-page h1 { color:#12355b; }
+
+.back-button {
+    display:inline-flex; align-items:center; gap:6px; margin-bottom:1rem;
+    padding:0; border:none; background:transparent; color:#64748b;
+    font-size:.9rem; font-weight:600; cursor:pointer;
+}
+.back-button:hover { color:#1c39bb; }
+
+.empty-state { padding:3rem 2rem; text-align:center; color:#64748b; }
+.empty-state h2 { color:#12355b; }
+
+.quiz-question {
+    background:#fff; border:1px solid #e2e8f0; border-radius:12px;
+    padding:20px 22px; margin-bottom:1rem; box-shadow:0 3px 10px rgba(15,23,42,.04);
+}
+.quiz-question h3 { margin:0 0 12px; color:#12355b; font-size:1rem; }
+.q-marks { color:#94a3b8; font-weight:500; font-size:.85rem; }
+
+.opt-row { display:flex; align-items:center; gap:10px; padding:8px 0; color:#172033; cursor:pointer; }
+.opt-row input { width:18px; height:18px; accent-color:#1c39bb; }
+.fill-input { width:100%; max-width:420px; padding:.6rem .8rem; border:1px solid #cbd5e1; border-radius:8px; }
+
+.submit-quiz {
+    padding:.75rem 1.4rem; border:none; border-radius:10px;
+    background:#1c39bb; color:#fff; font-weight:700; cursor:pointer; margin-top:.5rem;
+}
+.submit-quiz:hover { background:#152d96; }
+.submit-quiz:disabled { opacity:.6; cursor:not-allowed; }
+
+.quiz-result {
+    background:#fff; border:1px solid #e2e8f0; border-radius:16px;
+    padding:40px; text-align:center; box-shadow:0 10px 30px rgba(15,23,42,.08);
+}
+.quiz-result.passed { border-top:5px solid #16a34a; }
+.quiz-result.failed { border-top:5px solid #dc2626; }
+.result-score { font-size:2rem; font-weight:800; color:#12355b; margin:.5rem 0; }
+.result-detail { color:#64748b; }
+.result-actions { display:flex; gap:1rem; justify-content:center; margin-top:1.5rem; }
+
+.cert-note { margin-top:1rem; color:#166534; font-size:1rem; }
+.cert-note strong { color:#12355b; letter-spacing:.03em; }
+
+
+/* ---- Passed: certificate card ---- */
+.pass-heading { text-align:center; color:#166534; margin:.5rem 0 1rem; }
+
+.cert-card {
+    --accent:#1c39bb;
+    max-width: 720px; margin: 0 auto;
+    background:#fff; border-radius:16px; padding:14px;
+    box-shadow:0 16px 40px rgba(15,23,42,.14);
+}
+.cert-frame {
+    position:relative; padding:40px 44px 32px; text-align:center;
+    border:2px solid var(--accent); border-radius:12px;
+}
+.cert-frame::before {
+    content:""; position:absolute; inset:8px;
+    border:1px solid rgba(15,23,42,.10); border-radius:8px; pointer-events:none;
+}
+.cert-brand { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:20px; }
+.cert-logo-mark { width:42px; height:42px; color:var(--accent); flex-shrink:0; }
+.cert-brand-text { display:flex; flex-direction:column; align-items:flex-start; line-height:1.1; }
+.cert-brand-name { color:#12355b; font-size:1.35rem; font-weight:800; }
+.cert-brand-sub { color:var(--accent); font-size:.6rem; font-weight:700; letter-spacing:.18em; }
+.cert-eyebrow { margin:0 0 10px; color:var(--accent); font-size:.82rem; font-weight:700; letter-spacing:.26em; }
+.cert-underline { width:54px; height:2px; margin:0 auto 20px; background:var(--accent); border-radius:2px; }
+.cert-line { margin:8px 0; color:#64748b; font-size:1rem; }
+.cert-line strong { color:#12355b; }
+.cert-name { margin:8px 0; color:#0f2a4a; font-size:2.1rem; font-weight:800; }
+.cert-module { margin:10px 0; color:var(--accent); font-size:1.4rem; font-weight:800; }
+.cert-medal { width:60px; height:76px; margin-top:14px; color:var(--accent); }
+.cert-foot { margin:16px 0 0; color:#94a3b8; font-size:.72rem; }

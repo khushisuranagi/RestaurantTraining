@@ -1,0 +1,73 @@
+.brand {
+    padding: 1rem 1.5rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #1b6ec2;
+}
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+.login-card {
+    width: 320px;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.5rem;
+    color: #fff;
+    background-color: #1b6ec2;
+    border: 1px solid #1861ac;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-button:disabled {
+    background-color: #6c9bd1;
+    cursor: not-allowed;
+}
+
+.message {
+    color: #e50000;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.register-link {
+    margin: 1rem 0 0;
+    text-align: center;
+    font-size: .9rem;
+}

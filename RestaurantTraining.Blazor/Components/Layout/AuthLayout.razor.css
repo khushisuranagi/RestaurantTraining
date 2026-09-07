@@ -1,0 +1,9 @@
+/* CSS for AuthLayout component */
+.auth-layout {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.auth-content {
+    width: 100%;
+}

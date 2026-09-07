@@ -1,0 +1,555 @@
+/* =========================================================
+   QUIZ PAGE
+   ========================================================= */
+
+.modules-page {
+    width: 100%;
+    max-width: none;
+    padding: 32px 40px;
+    box-sizing: border-box;
+    color: #172033;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modules-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+    .modules-header h1 {
+        margin: 0.35rem 0 0.5rem;
+        color: #12355b;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .modules-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+.eyebrow {
+    margin: 0;
+    color: #1C39BB !important;
+    font-size: 0.8rem !important;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .back-button:hover {
+        color: #1C39BB;
+    }
+
+.create-module-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.1rem;
+    border: none;
+    border-radius: 8px;
+    background: #1C39BB;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s ease;
+}
+
+    .create-module-button:hover {
+        background: #152d96;
+    }
+
+
+/* =========================================================
+   LOADING / EMPTY
+   ========================================================= */
+
+.loading-state {
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #64748b;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+}
+
+.empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+    .empty-state h3 {
+        margin: 0 0 0.5rem;
+        color: #12355b;
+        font-size: 1.1rem;
+    }
+
+    .empty-state p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+
+/* =========================================================
+   QUESTION LIST
+   ========================================================= */
+
+.modules-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+
+.module-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 18px 22px;
+    border-bottom: 1px solid #eef1f6;
+}
+
+    .module-row:last-child {
+        border-bottom: none;
+    }
+
+.module-info h3 {
+    margin: 0 0 4px;
+    color: #12355b;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.module-info p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.module-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.edit-button,
+.delete-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.edit-button {
+    border: 1px solid #1c39bb;
+    background: #ffffff;
+    color: #1c39bb;
+}
+
+    .edit-button:hover {
+        background: #eef1fb;
+    }
+
+.delete-button {
+    border: 1px solid #fecaca;
+    background: #ffffff;
+    color: #b91c1c;
+}
+
+    .delete-button:hover {
+        background: #fef2f2;
+    }
+
+
+/* =========================================================
+   MODAL  (Add / Edit Question)
+   ========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    background: rgba(15, 23, 42, 0.45);
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.module-form {
+    width: 100%;
+    max-width: 520px;
+    padding: 28px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+    box-sizing: border-box;
+}
+
+.form-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+    .form-header h2 {
+        margin: 0 0 0.25rem;
+        color: #12355b;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .form-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+.close-button {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .close-button:hover {
+        background: #e2e8f0;
+        color: #12355b;
+    }
+
+.form-group {
+    margin-bottom: 1.1rem;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: #334155;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.65rem 0.8rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #172033;
+        font-size: 0.9rem;
+        font-family: inherit;
+        box-sizing: border-box;
+        transition: 0.2s ease;
+    }
+
+    .form-group textarea {
+        min-height: 90px;
+        resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #1c39bb;
+        box-shadow: 0 0 0 3px rgba(28, 57, 187, 0.12);
+    }
+
+.form-error {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #b91c1c;
+    font-size: 0.9rem;
+}
+
+
+/* =========================================================
+   ANSWER OPTIONS EDITOR
+   ========================================================= */
+
+.option-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+}
+
+    /* the "correct" checkbox */
+    .option-row input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        accent-color: #1c39bb;
+        cursor: pointer;
+    }
+
+    /* the option text box takes the remaining space */
+    .option-row .option-text {
+        flex: 1;
+    }
+
+.option-remove {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #b91c1c;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .option-remove:hover {
+        background: #fef2f2;
+    }
+
+.radio-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #172033;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+    .radio-row input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #1c39bb;
+        cursor: pointer;
+    }
+
+.add-option-button {
+    margin-top: 0.2rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1c39bb;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .add-option-button:hover {
+        border-color: #1c39bb;
+        background: #eef1fb;
+    }
+
+.field-hint {
+    margin: 0.5rem 0 0;
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+}
+
+.cancel-button,
+.save-button {
+    padding: 0.65rem 1.3rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.cancel-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+    .cancel-button:hover {
+        background: #f1f5f9;
+    }
+
+.save-button {
+    border: none;
+    background: #1c39bb;
+    color: #ffffff;
+}
+
+    .save-button:hover {
+        background: #152d96;
+    }
+
+    .save-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .modules-page {
+        padding: 24px 20px;
+    }
+
+    .modules-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .create-module-button {
+        width: 100%;
+    }
+
+    .module-row {
+        flex-direction: column;
+        align-items: flex-start;
+    
+     }
+}
+.certificate-cta {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   PASSING SCORE BAR
+   ========================================================= */
+
+.score-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+    padding: 18px 22px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+}
+
+    .score-bar label {
+        display: block;
+        margin-bottom: 2px;
+        color: #12355b;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .score-bar .field-hint {
+        margin: 0;
+        max-width: 520px;
+        color: #64748b;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+.score-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.score-input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 44px;
+    padding: 0 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    transition: 0.2s ease;
+}
+
+    .score-input input {
+        width: 64px;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #12355b;
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-align: right;
+    }
+
+    .score-input span {
+        color: #64748b;
+        font-weight: 700;
+    }
+
+    .score-input:focus-within {
+        border-color: #1c39bb;
+        box-shadow: 0 0 0 3px rgba(28, 57, 187, 0.12);
+    }
+
+.score-note {
+    margin-bottom: 1.25rem;
+    padding: 0.7rem 1rem;
+    background: #eef2ff;
+    border: 1px solid #d6e0ff;
+    border-radius: 8px;
+    color: #1c39bb;
+    font-size: 0.88rem;
+    font-weight: 600;
+}

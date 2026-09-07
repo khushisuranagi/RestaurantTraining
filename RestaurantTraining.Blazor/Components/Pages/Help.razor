@@ -1,0 +1,68 @@
+@page "/help"
+@using RestaurantTraining.Blazor.Services
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Help</PageTitle>
+
+<div class="help-page">
+
+    <p class="eyebrow">SUPPORT</p>
+    <h1>Help &amp; FAQ</h1>
+    <p class="help-sub">Answers to the most common questions about your training.</p>
+
+    <div class="faq-list">
+        @foreach (var (item, index) in faqs.Select((f, i) => (f, i)))
+        {
+            <div class="faq-item @(IsOpen(index) ? "open" : "")">
+                <button class="faq-q" @onclick="() => Toggle(index)">
+                    <span>@item.Question</span>
+                    <span class="faq-chevron">@(IsOpen(index) ? "−" : "+")</span>
+                </button>
+                @if (IsOpen(index))
+                {
+                    <div class="faq-a">@item.Answer</div>
+                }
+            </div>
+        }
+    </div>
+
+    
+
+</div>
+
+@code {
+    private HashSet<int> openItems = new();
+
+    private record Faq(string Question, string Answer);
+
+    private readonly List<Faq> faqs =
+    [
+        new("How do I complete a module?",
+            "Open the module from Learning Modules, go through each lesson, and click Next. On the last lesson, click Take Quiz and pass it to finish the module."),
+        new("How do I earn a certificate?",
+            "Pass the module's quiz with at least the required passing score. Your certificate is created automatically and appears on your Certificates page."),
+        new("Where can I find my certificates?",
+            "Open Certificates in the sidebar. Every certificate you've earned is listed there with your name, the module and your score."),
+        new("Why can't I see a module?",
+            "Modules are assigned by role. If a module you expected isn't listed, ask your trainer to assign it to your role."),
+        new("I failed a quiz — can I try again?",
+            "Yes. Reopen the module, go to the quiz and submit again. Your best passing attempt is the one that counts."),
+        new("What does \"Pending\" vs \"Assigned\" mean?",
+            "Assigned means a module has been given to your role but you haven't started it yet. Pending means you've started it but haven't finished all the lessons and the quiz."),
+        new("What is a passing score?",
+            "It's the minimum percentage you need on the module's quiz to pass. It can be different for each module and is shown on the quiz result.")
+    ];
+
+    protected override void OnInitialized()
+    {
+        if (!AuthState.IsLoggedIn) Navigation.NavigateTo("/login");
+    }
+
+    private bool IsOpen(int index) => openItems.Contains(index);
+
+    private void Toggle(int index)
+    {
+        if (!openItems.Add(index)) openItems.Remove(index);
+    }
+}

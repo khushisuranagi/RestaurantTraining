@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/RestaurantTraining/" />
+  <Folder Name="/src/RestaurantTraining/API/">
+    <Project Path="RestaurantTraining.API/RestaurantTraining.API.csproj" />
+  </Folder>
+  <Folder Name="/src/RestaurantTraining/Blazor/">
+    <Project Path="RestaurantTraining.Blazor/RestaurantTraining.Blazor.csproj" Id="1d2df3fb-9824-46b7-82af-66044edf76fe" />
+  </Folder>
+  <Folder Name="/src/RestaurantTraining/Core/">
+    <Project Path="RestaurantTraining.Application/RestaurantTraining.Application.csproj" />
+    <Project Path="RestaurantTraining.Domain/RestaurantTraining.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/RestaurantTraining/Infrastructure/">
+    <Project Path="RestaurantTraining.Infrastructure/RestaurantTraining.Infrastructure.csproj" />
+    <Project Path="RestaurantTraining.Persistence/RestaurantTraining.Persistence.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,151 @@
+@page "/content-creator-dashboard"
+
+<PageTitle>Content Creator Dashboard</PageTitle>
+
+<div class="creator-dashboard">
+
+    <header class="dashboard-header">
+        <div>
+            <p class="eyebrow">CONTENT CREATOR</p>
+            <h1>Welcome back, @AuthState.FullName</h1>
+            <p>Here is an overview of your restaurant training content.</p>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="dashboard-message">@errorMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <p>Loading your dashboard...</p>
+    }
+    else if (data is not null)
+    {
+        @* ---- Stat cards ---- *@
+        <section class="stat-grid">
+            <div class="stat-card"><span>Modules</span><strong>@data.ModuleCount</strong><small>@data.ActiveModules active · @data.InactiveModules inactive</small></div>
+            <div class="stat-card"><span>Lessons</span><strong>@data.LessonCount</strong><small>Across all modules</small></div>
+            <div class="stat-card"><span>Quiz Questions</span><strong>@data.QuizQuestionCount</strong><small>@data.ModulesAssignedCount modules assigned</small></div>
+            <div class="stat-card"><span>Certificates Issued</span><strong>@data.CertificatesIssued</strong><small>to learners</small></div>
+        </section>
+
+        <div class="dash-columns">
+
+            @* ---- Needs attention ---- *@
+            <section class="dashboard-section">
+                <div class="section-heading">
+                    <h2>Needs attention</h2>
+                    <span class="attn-count @(AttentionCount == 0 ? "clear" : "")">@AttentionCount</span>
+                </div>
+
+                @if (AttentionCount == 0)
+                {
+                    <p class="all-clear">🎉 Everything looks complete — nice work!</p>
+                }
+                else
+                {
+                    <ul class="attn-list">
+                        @foreach (var m in data.ModulesNotAssigned)
+                        {
+                            <li @onclick="() => OpenModule(m.ModuleId)">
+                                <span class="attn-dot red"></span>
+                                <span><strong>@m.ModuleName</strong> isn't assigned to any role — learners can't see it.</span>
+                            </li>
+                        }
+                        @foreach (var m in data.ModulesWithoutLessons)
+                        {
+                            <li @onclick="() => OpenModule(m.ModuleId)">
+                                <span class="attn-dot amber"></span>
+                                <span><strong>@m.ModuleName</strong> has no lessons yet.</span>
+                            </li>
+                        }
+                        @foreach (var m in data.ModulesWithoutQuiz)
+                        {
+                            <li @onclick="() => OpenQuizFor(m.ModuleId)">
+                                <span class="attn-dot amber"></span>
+                                <span><strong>@m.ModuleName</strong> has no quiz.</span>
+                            </li>
+                        }
+                        @foreach (var l in data.LessonsWithoutResources)
+                        {
+                            <li>
+                                <span class="attn-dot grey"></span>
+                                <span>Lesson <strong>@l.LessonTitle</strong> has no material.</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </section>
+
+            @* ---- Learner progress ---- *@
+            <section class="dashboard-section">
+                <div class="section-heading"><h2>Learner Progress</h2></div>
+
+                <div class="impact-row">
+                    <div class="impact-tile">
+                        <strong>@data.LearnersAssigned</strong>
+                        <small>Total Learners</small>
+                    </div>
+                    <div class="impact-tile">
+                        <strong>@data.ActiveLearners</strong>
+                        <small>active learners<br />(started a lesson)</small>
+                    </div>
+                    <div class="impact-tile">
+                        <strong>@data.LearnersCompleted</strong>
+                        <small>completed a module<br />(earned a certificate)</small>
+                    </div>
+                </div>
+
+                <h3 class="impact-sub">Recent certificates</h3>
+                @if (data.RecentCertificates.Count == 0)
+                {
+                    <p class="muted">No certificates issued yet.</p>
+                }
+                else
+                {
+                    <ul class="cert-feed">
+                        @foreach (var c in data.RecentCertificates)
+                        {
+                            <li>
+                                <span class="cert-badge">🏅</span>
+                                <span><strong>@c.LearnerName</strong> earned <strong>@c.ModuleName</strong></span>
+                                <span class="cert-date">@c.IssuedDate.ToString("MMM d")</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </section>
+
+        </div>
+
+        @* ---- Recent modules ---- *@
+        <section class="dashboard-section">
+            <div class="section-heading"><h2>Recent Modules</h2></div>
+
+            @if (data.RecentModules.Count == 0)
+            {
+                <div class="empty-state"><h3>No modules yet</h3><p>Create your first training module to begin.</p></div>
+            }
+            else
+            {
+                <div class="module-list">
+                    @foreach (var module in data.RecentModules)
+                    {
+                        <div class="module-row" @onclick="() => OpenModule(module.ModuleId)">
+                            <div>
+                                <h3>@module.ModuleName</h3>
+                                <p>@(string.IsNullOrWhiteSpace(module.Description) ? "No description added." : module.Description)</p>
+                            </div>
+                            <span class="status @(module.IsActive ? "active" : "inactive")">
+                                @(module.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    }
+
+</div>

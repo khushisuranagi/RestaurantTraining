@@ -1,0 +1,363 @@
+﻿@page "/lessons/{LessonId:int}"
+
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services.LessonManagement
+@using RestaurantTraining.Domain.Enums
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Lesson</PageTitle>
+
+<div class="modules-page">
+
+    <div class="modules-header">
+
+        <div>
+
+            <button class="back-button"
+                    @onclick="BackToLessons">
+                ← Back to Lessons
+            </button>
+
+            <p class="eyebrow">LESSON</p>
+
+            @if (lesson != null)
+            {
+                <h1>@lesson.LessonTitle</h1>
+
+                <p>
+                    @(string.IsNullOrWhiteSpace(lesson.Description)
+                        ? "Manage resources for this lesson."
+                        : lesson.Description)
+                </p>
+            }
+
+        </div>
+
+      
+
+    </div>
+
+
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            Loading lesson...
+        </div>
+    }
+    else if (lesson == null)
+    {
+        <div class="empty-state">
+            <h3>Lesson not found</h3>
+        </div>
+    }
+    else
+    {
+        @if (resources.Count == 0)
+        {
+            <div class="empty-state">
+                <h3>No resources yet</h3>
+                <p>Add a resource to this lesson.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var resource in resources
+    .Where(x => x.LessonId == lesson.LessonId)
+    .OrderBy(x => x.SortOrder))
+            {
+                <div class="resource-card">
+
+                    <div class="resource-type-label">
+                        @resource.ResourceType.ToString().ToUpper()
+                    </div>
+
+
+                    @if (resource.ResourceType == ResourceType.Image)
+                    {
+                        @if (!string.IsNullOrWhiteSpace(resource.FileData))
+                        {
+                            <div class="image-resource">
+                                <img src="@GetFileDataUrl(resource)"
+                                     alt="@resource.FileName"
+                                     class="resource-image" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="resource-fallback">
+                                Image could not be loaded.
+                            </div>
+                        }
+                    }
+
+
+                    else if (resource.ResourceType == ResourceType.Pdf)
+                    {
+                        @if (!string.IsNullOrWhiteSpace(resource.FileData))
+                        {
+                            <div class="pdf-resource">
+                                <iframe src="@GetFileDataUrl(resource)"
+                                        class="resource-pdf"
+                                        title="@resource.FileName">
+                                </iframe>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="resource-fallback">
+                                PDF could not be loaded.
+                            </div>
+                        }
+                    }
+
+
+                    else if (resource.ResourceType == ResourceType.Article)
+                    {
+                        <div class="article-resource">
+
+                            <a href="@resource.ResourceUrl"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="resource-link">
+
+                                Open Article →
+
+                            </a>
+
+                        </div>
+                    }
+
+
+                    else if (resource.ResourceType == ResourceType.Video)
+                    {
+                        var embedUrl =
+                            GetYouTubeEmbedUrl(resource.ResourceUrl);
+
+                        @if (embedUrl != null)
+                        {
+                            <div class="video-resource">
+
+                                <iframe src="@embedUrl"
+                                        class="resource-video"
+                                        title="Video resource"
+                                        allowfullscreen>
+                                </iframe>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="article-resource">
+
+                                <a href="@resource.ResourceUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="resource-link">
+
+                                    Open Video →
+
+                                </a>
+
+                            </div>
+                        }
+                    }
+
+
+                    @if (!string.IsNullOrWhiteSpace(resource.ContentText))
+                    {
+                        <p class="resource-description">
+                            @resource.ContentText
+                        </p>
+                    }
+
+
+                    <div class="resource-actions">
+
+                        <button class="edit-button"
+                                @onclick="() => OpenEditResourceModal(resource)">
+                            ✏️ Edit
+                        </button>
+
+                        <button class="delete-button"
+                                @onclick="() => DeleteResource(resource)">
+                            🗑️ Delete
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+        }
+    }
+
+</div>
+
+
+@if (showResourceModal)
+{
+    <div class="modal-overlay">
+
+        <div class="module-form">
+
+            <div class="form-header">
+
+                <div>
+
+                    <h2>
+                        @(editingResourceId == 0
+                            ? "Add Resource"
+                            : "Edit Resource")
+                    </h2>
+
+                    <p>
+                        @(editingResourceId == 0
+                            ? "Add a resource to this lesson."
+                            : "Update this resource for the lesson.")
+                    </p>
+
+                </div>
+
+                <button class="close-button"
+                        @onclick="CloseResourceModal">
+                    ×
+                </button>
+
+            </div>
+
+
+            @if (!string.IsNullOrWhiteSpace(saveError))
+            {
+                <div class="form-error">
+                    @saveError
+                </div>
+            }
+
+
+            <div class="form-group">
+
+                <label>Resource Type</label>
+
+                <select @bind="resourceType">
+
+                    @foreach (var type in Enum.GetValues<ResourceType>())
+                    {
+                        <option value="@type">
+                            @type
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            @if (resourceType == ResourceType.Video)
+            {
+                <div class="form-group">
+
+                    <label>Video URL</label>
+
+                    <input type="url"
+                           @bind="resourceUrl"
+                           placeholder="Paste video URL" />
+
+                </div>
+            }
+
+
+            @if (resourceType == ResourceType.Article)
+            {
+                <div class="form-group">
+
+                    <label>Article URL</label>
+
+                    <input type="url"
+                           @bind="resourceUrl"
+                           placeholder="Paste article URL" />
+
+                </div>
+            }
+
+
+            @if (resourceType == ResourceType.Pdf)
+            {
+                <div class="form-group">
+
+                    <label>PDF File</label>
+
+                    <InputFile accept=".pdf,application/pdf"
+                               OnChange="HandleFileSelected" />
+
+                    @if (editingResourceId != 0)
+                    {
+                        <p class="field-hint">
+                            Leave empty to keep the current PDF.
+                        </p>
+                    }
+
+                </div>
+            }
+
+
+            @if (resourceType == ResourceType.Image)
+            {
+                <div class="form-group">
+
+                    <label>Image File</label>
+
+                    <InputFile accept="image/*"
+                               OnChange="HandleFileSelected" />
+
+                    @if (editingResourceId != 0)
+                    {
+                        <p class="field-hint">
+                            Leave empty to keep the current image.
+                        </p>
+                    }
+
+                </div>
+            }
+
+
+            <div class="form-group">
+
+                <label>Content / Description</label>
+
+                <textarea @bind="resourceContent"
+                          placeholder="Enter information or description for this resource">
+                </textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Sort Order</label>
+
+                <input type="number"
+                       @bind="resourceSortOrder" />
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button class="cancel-button"
+                        @onclick="CloseResourceModal">
+                    Cancel
+                </button>
+
+                <button class="save-button"
+                        @onclick="SaveResource"
+                        disabled="@isSaving">
+
+                    @(isSaving ? "Saving..." : "Save")
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}

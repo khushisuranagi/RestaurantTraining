@@ -1,0 +1,895 @@
+﻿@page "/modules"
+@page "/modules/{ModuleId:int}"
+
+<PageTitle>Modules</PageTitle>
+
+<div class="modules-page">
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="modules-message">
+            @errorMessage
+        </div>
+    }
+
+    @if (selectedModule == null)
+    {
+        <!-- MODULE LIST -->
+
+        <div class="modules-header">
+            <div>
+                <p class="eyebrow">CONTENT MANAGEMENT</p>
+                <h1>Modules</h1>
+                <p>Manage your restaurant training modules.</p>
+            </div>
+
+            <button class="create-module-button"
+                    @onclick="OpenCreateModuleModal">
+                + Create Module
+            </button>
+        </div>
+
+        <div class="modules-toolbar">
+
+            <div class="search-box">
+                <span class="search-icon">⌕</span>
+
+                <input type="text"
+                       placeholder="Search modules..."
+                       @bind="searchText"
+                       @bind:event="oninput" />
+            </div>
+
+            <select class="status-filter" @bind="statusFilter">
+                <option value="All">All</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                Loading modules...
+            </div>
+        }
+        else if (FilteredModules.Count == 0)
+        {
+            <div class="modules-card">
+
+                <div class="empty-state">
+                    <h3>No modules found</h3>
+
+                    <p>
+                        Create a module to start building your training content.
+                    </p>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="modules-card">
+
+                <div class="modules-card-header">
+                    <span>Module</span>
+                    <span>Status</span>
+                    <span>Actions</span>
+                </div>
+
+                @foreach (var module in FilteredModules)
+                {
+                    <div class="module-row">
+
+                        <div class="module-info">
+
+                            <h3>@module.ModuleName</h3>
+
+                            <p>
+                                @(string.IsNullOrWhiteSpace(module.Description)
+                                    ? "No description added."
+                                    : module.Description)
+                            </p>
+
+                        </div>
+
+                        <span class="status @(module.IsActive ? "active" : "inactive")">
+                            @(module.IsActive ? "Active" : "Inactive")
+                        </span>
+
+                        <div class="module-actions">
+
+                            <button class="edit-button"
+                                    @onclick="() => OpenModule(module)">
+                                Open
+                            </button>
+
+                            <button class="edit-button"
+                                    @onclick="async () => await OpenEditModuleModal(module)">
+                                Edit
+                            </button>
+
+                            @* Quiz moved to the "Quiz Management" section in the sidebar. *@
+
+                            <button class="delete-button"
+                                    @onclick="() => OpenDeleteModuleModal(module)">
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    }
+    else
+    {
+        <!-- ================= SELECTED MODULE ================= -->
+
+        <div class="modules-header">
+
+            <div>
+
+                <button class="back-button"
+                        @onclick="BackToModules">
+                    ← Back to Modules
+                </button>
+
+                <p class="eyebrow">MODULE</p>
+
+                <h1>@selectedModule.ModuleName</h1>
+
+                <p>
+                    @(string.IsNullOrWhiteSpace(selectedModule.Description)
+                        ? "No description added."
+                        : selectedModule.Description)
+                </p>
+
+            </div>
+
+            <button class="create-module-button"
+                    @onclick="OpenCreateLessonModal">
+                + Add Lesson
+            </button>
+
+        </div>
+
+        @if (isLoadingLessons)
+        {
+            <div class="loading-state">
+                Loading lessons...
+            </div>
+        }
+        else if (moduleLessons.Count == 0)
+        {
+            <div class="modules-card">
+
+                <div class="empty-state">
+
+                    <h3>No lessons yet</h3>
+
+                    <p>
+                        Add the first lesson to this module.
+                    </p>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="modules-card">
+
+                <div class="modules-card-header">
+                    <span>Lesson</span>
+                    <span>Status</span>
+                    <span>Actions</span>
+                </div>
+
+                @foreach (var lesson in moduleLessons.OrderBy(x => x.SortOrder))
+                {
+                    <div class="module-row">
+
+                        <div class="module-info">
+
+                            <h3>@lesson.LessonTitle</h3>
+
+                            <p>
+                                @(string.IsNullOrWhiteSpace(lesson.Description)
+                                    ? "No description added."
+                                    : lesson.Description)
+                            </p>
+
+                        </div>
+
+                        <span class="status @(lesson.IsActive ? "active" : "inactive")">
+                            @(lesson.IsActive ? "Active" : "Inactive")
+                        </span>
+
+                        <div class="module-actions">
+
+                            <button class="edit-button"
+                                    @onclick="() => OpenLesson(lesson)">
+                                Open
+                            </button>
+
+                            <button class="edit-button"
+                                    @onclick="() => OpenEditLessonModal(lesson)">
+                                Edit
+                            </button>
+
+                            <button class="delete-button"
+                                    @onclick="() => OpenDeleteLessonModal(lesson)">
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+    }
+
+
+    <!-- ================= LESSON RESOURCE VIEW ================= -->
+    @if (selectedLesson != null)
+    {
+        <div class="resource-section">
+
+            <div class="modules-header">
+
+                <div>
+
+                    <button class="back-button"
+                            @onclick="BackToLessons">
+                        ← Back to Lessons
+                    </button>
+
+                    <p class="eyebrow">LESSON RESOURCES</p>
+
+                    <h1>@selectedLesson.LessonTitle</h1>
+
+                    <p>
+                        @(string.IsNullOrWhiteSpace(selectedLesson.Description)
+                            ? "Manage resources for this lesson."
+                            : selectedLesson.Description)
+                    </p>
+
+                </div>
+
+                <button class="create-module-button"
+                        @onclick="OpenCreateResourceModal">
+                    + Add Resource
+                </button>
+
+            </div>
+
+            @if (isLoadingResources)
+            {
+                <div class="loading-state">
+                    Loading resources...
+                </div>
+            }
+            else if (lessonResources.Count == 0)
+            {
+                <div class="modules-card">
+
+                    <div class="empty-state">
+
+                        <h3>No resources yet</h3>
+
+                        <p>
+                            Add a video, image, article, or PDF to this lesson.
+                        </p>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="modules-card">
+
+                    @foreach (var resource in lessonResources.OrderBy(x => x.SortOrder))
+                    {
+                        <div class="module-row">
+
+                            <div class="module-info">
+
+                                <h3>@resource.ResourceType</h3>
+
+                                @if (!string.IsNullOrWhiteSpace(resource.ContentText))
+                                {
+                                    <p>@resource.ContentText</p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                                {
+                                    <p>@resource.ResourceUrl</p>
+                                }
+
+                            </div>
+
+                            <span class="status @(resource.IsActive ? "active" : "inactive")">
+                                @(resource.IsActive ? "Active" : "Inactive")
+                            </span>
+
+                            <div class="module-actions">
+
+                                <button class="edit-button"
+                                        @onclick="() => OpenEditResourceModal(resource)">
+                                    Edit
+                                </button>
+
+                                <button class="delete-button"
+                                        @onclick="() => OpenDeleteResourceModal(resource)">
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+    }
+
+
+    <!-- ================= MODULE MODAL ================= -->
+    @if (showModuleModal)
+    {
+        <div class="modal-overlay">
+
+            <div class="module-form">
+
+                <div class="form-header">
+
+                    <div>
+
+                        <h2>
+                            @(editingModule == null
+                                ? "Create Module"
+                                : "Edit Module")
+                        </h2>
+
+                        <p>
+                            @(editingModule == null
+                                ? "Add a new training module."
+                                : "Update this training module.")
+                        </p>
+
+                    </div>
+
+                    <button class="close-button"
+                            @onclick="CloseModuleModal">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <!-- MODULE NAME -->
+
+                <div class="form-group">
+
+                    <label>Module Name</label>
+
+                    <input type="text"
+                           @bind="moduleName"
+                           placeholder="Enter module name" />
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group">
+
+                    <label>Description</label>
+
+                    <textarea @bind="moduleDescription"
+                              placeholder="Enter module description"></textarea>
+
+                </div>
+
+
+                <!-- ROLE ASSIGNMENT -->
+
+                <div class="form-group role-form-group">
+
+                    <label>Assign to roles</label>
+
+                    <div class="role-selection-list">
+
+                        @foreach (var role in availableRoles)
+                        {
+                            <label class="role-checkbox">
+
+                                <input type="checkbox"
+                                       checked="@selectedRoleIds.Contains(role.RoleId)"
+                                       @onchange="() => ToggleRole(role.RoleId)" />
+
+                                <span>@role.RoleName</span>
+
+                            </label>
+                        }
+
+                    </div>
+
+                    <p class="field-hint">
+                        Select every learner role that should receive this module.
+                    </p>
+
+                </div>
+
+
+                <!-- STATUS -->
+                @if (editingModule != null)
+                {
+                    <div class="form-group">
+
+                        <label>Status</label>
+
+                        <select @bind="ModuleStatus">
+
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+
+                        </select>
+
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrEmpty(formMessage))
+                {
+                    <div class="form-message">
+                        @formMessage
+                    </div>
+                }
+
+
+                <!-- FORM BUTTONS -->
+
+                <div class="form-actions">
+
+                    <button class="cancel-button"
+                            @onclick="CloseModuleModal">
+                        Cancel
+                    </button>
+
+                    <button class="save-button"
+                            @onclick="SaveModule"
+                            disabled="@isSaving">
+
+                        @(isSaving ? "Saving..." : "Save")
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ================= LESSON MODAL ================= -->
+    @if (showLessonModal)
+    {
+        <div class="modal-overlay">
+
+            <div class="module-form">
+
+                <div class="form-header">
+
+                    <div>
+
+                        <h2>
+                            @(editingLesson == null
+                                ? "Add Lesson"
+                                : "Edit Lesson")
+                        </h2>
+
+                        <p>
+                            Add a lesson to @selectedModule?.ModuleName.
+                        </p>
+
+                    </div>
+
+                    <button class="close-button"
+                            @onclick="CloseLessonModal">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Lesson Title</label>
+
+                    <input type="text"
+                           @bind="lessonTitle"
+                           placeholder="Enter lesson title" />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Description</label>
+
+                    <textarea @bind="lessonDescription"
+                              placeholder="Enter lesson description"></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Sort Order</label>
+
+                    <input type="number"
+                           @bind="lessonSortOrder" />
+
+                </div>
+
+
+                @if (editingLesson != null)
+                {
+                    <div class="form-group">
+
+                        <label>Status</label>
+
+                        <select @bind="LessonStatus">
+
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+
+                        </select>
+
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrEmpty(formMessage))
+                {
+                    <div class="form-message">
+                        @formMessage
+                    </div>
+                }
+
+
+                <div class="form-actions">
+
+                    <button class="cancel-button"
+                            @onclick="CloseLessonModal">
+                        Cancel
+                    </button>
+
+                    <button class="save-button"
+                            @onclick="SaveLesson"
+                            disabled="@isSaving">
+
+                        @(isSaving ? "Saving..." : "Save")
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ================= RESOURCE MODAL ================= -->
+    @if (showResourceModal)
+    {
+        <div class="modal-overlay">
+
+            <div class="module-form">
+
+                <div class="form-header">
+
+                    <div>
+
+                        <h2>
+                            @(editingResource == null
+                                ? "Add Resource"
+                                : "Edit Resource")
+                        </h2>
+
+                        <p>
+                            Add any type of resource to this lesson.
+                        </p>
+
+                    </div>
+
+                    <button class="close-button"
+                            @onclick="CloseResourceModal">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Resource Type</label>
+
+                    <select @bind="resourceType">
+
+                        @foreach (var type in Enum.GetValues<ResourceType>())
+                        {
+                            <option value="@type">
+                                @type
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+
+                @if (resourceType == ResourceType.Video)
+                {
+                    <div class="form-group">
+
+                        <label>Video URL</label>
+
+                        <input type="url"
+                               @bind="resourceUrl"
+                               placeholder="Paste video URL" />
+
+                    </div>
+                }
+
+
+                @if (resourceType == ResourceType.Article)
+                {
+                    <div class="form-group">
+
+                        <label>Article URL</label>
+
+                        <input type="url"
+                               @bind="resourceUrl"
+                               placeholder="Paste article URL" />
+
+                    </div>
+                }
+
+
+                @if (resourceType == ResourceType.Pdf)
+                {
+                    <div class="form-group">
+
+                        <label>PDF File</label>
+
+                        <InputFile OnChange="HandleResourceFileSelected"
+                                   accept=".pdf,application/pdf" />
+
+                        @if (selectedResourceFile != null)
+                        {
+                            <p class="selected-file">
+                                @selectedResourceFile.Name
+                            </p>
+                        }
+
+                    </div>
+                }
+
+
+                @if (resourceType == ResourceType.Image)
+                {
+                    <div class="form-group">
+
+                        <label>Image File</label>
+
+                        <InputFile OnChange="HandleResourceFileSelected"
+                                   accept="image/*" />
+
+                        @if (selectedResourceFile != null)
+                        {
+                            <p class="selected-file">
+                                @selectedResourceFile.Name
+                            </p>
+                        }
+
+                    </div>
+                }
+
+
+                <div class="form-group">
+
+                    <label>Sort Order</label>
+
+                    <input type="number"
+                           @bind="resourceSortOrder" />
+
+                </div>
+
+
+                @if (editingResource != null)
+                {
+                    <div class="form-group">
+
+                        <label>Status</label>
+
+                        <select @bind="ResourceStatus">
+
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+
+                        </select>
+
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrEmpty(formMessage))
+                {
+                    <div class="form-message">
+                        @formMessage
+                    </div>
+                }
+
+
+                <div class="form-actions">
+
+                    <button class="cancel-button"
+                            @onclick="CloseResourceModal">
+                        Cancel
+                    </button>
+
+                    <button class="save-button"
+                            @onclick="SaveResource"
+                            disabled="@isSaving">
+
+                        @(isSaving ? "Saving..." : "Save")
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ================= DELETE MODULE MODAL ================= -->
+    @if (showDeleteModuleModal)
+    {
+        <div class="modal-overlay">
+
+            <div class="delete-form">
+
+                <div class="form-header">
+
+                    <div>
+
+                        <h2>Delete Module</h2>
+
+                        <p>
+                            Are you sure you want to delete
+                            "@moduleToDelete?.ModuleName"?
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button class="cancel-button"
+                            @onclick="CloseDeleteModuleModal">
+                        Cancel
+                    </button>
+
+                    <button class="confirm-delete-button"
+                            @onclick="DeleteModule">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ================= DELETE LESSON MODAL ================= -->
+    @if (showDeleteLessonModal)
+    {
+        <div class="modal-overlay">
+
+            <div class="delete-form">
+
+                <div class="form-header">
+
+                    <div>
+
+                        <h2>Delete Lesson</h2>
+
+                        <p>
+                            Are you sure you want to delete
+                            "@lessonToDelete?.LessonTitle"?
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button class="cancel-button"
+                            @onclick="CloseDeleteLessonModal">
+                        Cancel
+                    </button>
+
+                    <button class="confirm-delete-button"
+                            @onclick="DeleteLesson">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ================= DELETE RESOURCE MODAL ================= -->
+    @if (showDeleteResourceModal)
+    {
+        <div class="modal-overlay">
+
+            <div class="delete-form">
+
+                <div class="form-header">
+
+                    <div>
+
+                        <h2>Delete Resource</h2>
+
+                        <p>
+                            Are you sure you want to delete this resource?
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button class="cancel-button"
+                            @onclick="CloseDeleteResourceModal">
+                        Cancel
+                    </button>
+
+                    <button class="confirm-delete-button"
+                            @onclick="DeleteResource">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>

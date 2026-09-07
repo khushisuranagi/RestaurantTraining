@@ -1,0 +1,298 @@
+﻿@page "/quiz/{ModuleId:int}"
+
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Domain.Enums
+
+
+<PageTitle>Quiz Management</PageTitle>
+
+<div class="modules-page">
+
+    <div class="modules-header">
+
+        <div>
+            
+            <button class="back-button"
+                    @onclick="BackToModule">
+                ← Back to Module
+            </button>
+
+            <p class="eyebrow">QUIZ</p>
+
+            @if (module != null)
+            {
+                <h1>@module.ModuleName</h1>
+
+                <p>
+                    Manage quiz questions for this module.
+                </p>
+            }
+
+        </div>
+
+        <button class="create-module-button"
+                @onclick="OpenCreateQuestionModal">
+            + Add Question
+        </button>
+
+    </div>
+
+
+    @* Content Creator sets the score to pass *@
+    @if (!isLoading)
+    {
+        <div class="score-bar">
+            <div class="score-bar-left">
+                <label>Passing score for this module</label>
+                <p class="field-hint">
+                    Learners must score at least this on the quiz to complete the module.
+                </p>
+            </div>
+
+            <div class="score-bar-right">
+                <div class="score-input">
+                    <input type="number" min="0" max="100"
+                           @bind="passingScore" @bind:event="oninput" />
+                    <span>%</span>
+                </div>
+
+                <button class="save-button"
+                        @onclick="SavePassingScore"
+                        disabled="@isSavingScore">
+                    @(isSavingScore ? "Saving..." : "Save Score")
+                </button>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(scoreMessage))
+        {
+            <div class="score-note">@scoreMessage</div>
+        }
+    }
+
+
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            Loading quiz...
+        </div>
+    }
+    else if (questions.Count == 0)
+    {
+        <div class="modules-card">
+
+            <div class="empty-state">
+
+                <h3>No quiz questions yet</h3>
+
+                <p>
+                    Add questions to create the quiz for this module.
+                </p>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="modules-card">
+
+            @foreach (var question in questions)
+            {
+                <div class="module-row">
+
+                    <div class="module-info">
+
+                        <h3>@question.QuestionText</h3>
+
+                        <p>
+                            @question.QuestionType
+                            · @question.Marks mark(s)
+                        </p>
+
+                    </div>
+
+                    <div class="module-actions">
+
+                        <button class="edit-button"
+                                @onclick="() => OpenEditQuestionModal(question)">
+                            Edit
+                        </button>
+
+                        <button class="delete-button"
+                                @onclick="() => DeleteQuestion(question)">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+
+@if (showQuestionModal)
+{
+    <div class="modal-overlay">
+
+        <div class="module-form">
+
+            <div class="form-header">
+
+                <div>
+                    <h2>@(editingQuestionId == 0 ? "Add Question" : "Edit Question")</h2>
+
+                    <p>
+                        @(editingQuestionId == 0
+                            ? "Add a quiz question to this module."
+                            : "Update this quiz question.")
+                    </p>
+                </div>
+
+                <button class="close-button"
+                        @onclick="CloseQuestionModal">
+                    ×
+                </button>
+
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(saveError))
+            {
+                <div class="form-error">
+                    @saveError
+                </div>
+            }
+
+            <div class="form-group">
+                <label>Question Text</label>
+                <textarea @bind="questionText"
+                          placeholder="Type the question here"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Question Type</label>
+                <select @bind="questionType" @bind:after="OnQuestionTypeChanged">
+                    @foreach (var type in Enum.GetValues<QuestionType>())
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Marks</label>
+                <input type="number" @bind="marks" min="1" />
+            </div>
+
+            @* ---- MCQ: multiple options, one or more correct ---- *@
+            @if (IsMcq)
+            {
+                <div class="form-group">
+                    <label>Answer Options</label>
+
+                    @foreach (var row in optionRows)
+                    {
+                        <div class="option-row">
+                            <input type="checkbox"
+                                   @bind="row.IsCorrect"
+                                   title="Mark as correct" />
+
+                            <input type="text"
+                                   class="option-text"
+                                   @bind="row.Text"
+                                   placeholder="Option text" />
+
+                            <button type="button"
+                                    class="option-remove"
+                                    @onclick="() => RemoveOptionRow(row)">
+                                ×
+                            </button>
+                        </div>
+                    }
+
+                    <button type="button"
+                            class="add-option-button"
+                            @onclick="AddOptionRow">
+                        + Add Option
+                    </button>
+
+                    <p class="field-hint">
+                        Tick the checkbox next to the correct answer(s).
+                    </p>
+                </div>
+            }
+
+            @* ---- True / False: fixed options, pick one correct ---- *@
+            else if (IsTrueFalse)
+            {
+                <div class="form-group">
+                    <label>Correct Answer</label>
+
+                    @foreach (var row in optionRows)
+                    {
+                        <label class="radio-row">
+                            <input type="radio"
+                                   name="trueFalse"
+                                   checked="@row.IsCorrect"
+                                   @onchange="() => SetSingleCorrect(row)" />
+                            @row.Text
+                        </label>
+                    }
+
+                    <p class="field-hint">
+                        Choose whether the correct answer is True or False.
+                    </p>
+                </div>
+            }
+
+            @* ---- Fill in the Blank: one correct answer ---- *@
+            else if (IsFillBlank)
+            {
+                <div class="form-group">
+                    <label>Correct Answer</label>
+
+                    <input type="text"
+                           @bind="fillAnswer"
+                           placeholder="Type the exact correct answer" />
+
+                    <p class="field-hint">
+                        The trainee must type this answer to be marked correct.
+                    </p>
+                </div>
+            }
+
+            <div class="form-group">
+                <label>Explanation (optional)</label>
+                <textarea @bind="explanation"
+                          placeholder="Shown after answering, to explain the correct answer"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Image URL (optional)</label>
+                <input type="url" @bind="imageUrl"
+                       placeholder="Paste an image URL to show with the question" />
+            </div>
+
+            <div class="form-actions">
+
+                <button class="cancel-button"
+                        @onclick="CloseQuestionModal">
+                    Cancel
+                </button>
+
+                <button class="save-button"
+                        @onclick="SaveQuestion"
+                        disabled="@isSaving">
+                    @(isSaving ? "Saving..." : "Save")
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}

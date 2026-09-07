@@ -1,0 +1,99 @@
+@page "/learning-modules"
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.LearnerDashboardManagement
+@inject ILearnerDashboardService LearnerDashboardService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Learning Modules</PageTitle>
+
+<div class="modules-list-page">
+
+    <p class="eyebrow">MY LEARNING</p>
+    <h1>Learning Modules</h1>
+
+    @if (isLoading)
+    {
+        <p>Loading your modules...</p>
+    }
+    else
+    {
+        var pending = modules.Where(m => m.HasStarted && !m.IsCompleted).ToList();
+        var assigned = modules.Where(m => !m.HasStarted).ToList();
+        var completed = modules.Where(m => m.IsCompleted).ToList();
+
+        @*Pending (started, not finished) *@
+        <h2 class="section-title">Pending Modules <span class="count">@pending.Count</span></h2>
+        @if (pending.Count == 0)
+        {
+            <div class="empty-row">Nothing in progress right now.</div>
+        }
+        else
+        {
+            @foreach (var m in pending)
+            {
+                <div class="mod-row">
+                    <span class="mod-thumb">📖</span>
+                    <div class="mod-main">
+                        <h3>@m.ModuleName</h3>
+                        <div class="progress-track"><div class="progress-fill" style="width:@(m.ProgressPercent)%"></div></div>
+                    </div>
+                    <span class="mod-percent">@m.ProgressPercent%</span>
+                    <button class="mod-btn continue" @onclick="() => Open(m.ModuleId)">Continue →</button>
+                </div>
+            }
+        }
+
+        @* ---- Assigned (not started yet) ---- *@
+        <h2 class="section-title">Assigned Modules <span class="count">@assigned.Count</span></h2>
+        @if (assigned.Count == 0)
+        {
+            <div class="empty-row">No new modules to start.</div>
+        }
+        else
+        {
+            @foreach (var m in assigned)
+            {
+                <div class="mod-row">
+                    <span class="mod-thumb">📗</span>
+                    <div class="mod-main">
+                        <h3>@m.ModuleName</h3>
+                        <p class="mod-desc">@(string.IsNullOrWhiteSpace(m.Description) ? "Ready to start." : m.Description)</p>
+                    </div>
+                    <button class="mod-btn start" @onclick="() => Open(m.ModuleId)">Start</button>
+                </div>
+            }
+        }
+
+        @* ---- Completed ---- *@
+        @if (completed.Count > 0)
+        {
+            <h2 class="section-title">Completed <span class="count">@completed.Count</span></h2>
+            @foreach (var m in completed)
+            {
+                <div class="mod-row">
+                    <span class="mod-thumb">✅</span>
+                    <div class="mod-main"><h3>@m.ModuleName</h3></div>
+                    <span class="mod-done">Completed</span>
+                    <button class="mod-btn review" @onclick="() => Open(m.ModuleId)">Review</button>
+                </div>
+            }
+        }
+    }
+
+</div>
+
+@code {
+    private List<LearnerModuleOverviewModel> modules = [];
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator") { Navigation.NavigateTo("/login"); return; }
+        try { modules = await LearnerDashboardService.GetModulesOverviewAsync(); }
+        finally { isLoading = false; }
+    }
+
+    private void Open(int moduleId) => Navigation.NavigateTo($"/learning-modules/{moduleId}");
+}

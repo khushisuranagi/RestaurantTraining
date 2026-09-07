@@ -1,0 +1,72 @@
+@page "/quiz-management"
+
+@using RestaurantTraining.Blazor.Services
+
+<PageTitle>Quiz Management</PageTitle>
+
+<div class="modules-page">
+
+    <div class="modules-header">
+        <div>
+            <p class="eyebrow">CONTENT MANAGEMENT</p>
+            <h1>Quiz Management</h1>
+            <p>Pick a module to build or edit its quiz.</p>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">Loading modules...</div>
+    }
+    else if (modules.Count == 0)
+    {
+        <div class="modules-card">
+            <div class="empty-state">
+                <h3>No modules yet</h3>
+                <p>Create a module first, then add its quiz.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="modules-card">
+
+            <div class="modules-card-header">
+                <span>Module</span>
+                <span>Quiz</span>
+                <span>Actions</span>
+            </div>
+
+            @foreach (var module in modules)
+            {
+                var count = QuestionCount(module.ModuleId);
+
+                <div class="module-row">
+
+                    <div class="module-info">
+                        <h3>@module.ModuleName</h3>
+                        <p>
+                            @(string.IsNullOrWhiteSpace(module.Description)
+                                ? "No description added."
+                                : module.Description)
+                        </p>
+                    </div>
+
+                    <span class="status @(count > 0 ? "active" : "inactive")">
+                        @(count > 0 ? $"{count} question(s)" : "No quiz yet")
+                    </span>
+
+                    <div class="module-actions">
+                        <button class="edit-button"
+                                @onclick="() => ManageQuiz(module.ModuleId)">
+                            @(count > 0 ? "Edit Quiz" : "Add Quiz")
+                        </button>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

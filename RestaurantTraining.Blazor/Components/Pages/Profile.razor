@@ -1,0 +1,90 @@
+@page "/profile"
+@using System.Net.Http.Headers
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.ProfileManagement
+@inject IProfileService ProfileService 
+@inject AuthState AuthState
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>My Profile</PageTitle>
+
+<div class="profile-page">
+
+    <p class="eyebrow">ACCOUNT</p>
+    <h1>My Profile</h1>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">Loading your profile...</div>
+    }
+    else if (profile is null)
+    {
+        <div class="empty-state"><h3>Profile unavailable</h3><p>We couldn't load your details right now.</p></div>
+    }
+    else
+    {
+        <div class="profile-card">
+
+            <div class="profile-top">
+                <span class="profile-avatar-lg">@Initials(profile.FullName)</span>
+                <div>
+                    <h2>@profile.FullName</h2>
+                    <p class="profile-role">@profile.Role</p>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail"><span class="detail-label">Full name</span><span class="detail-value">@profile.FullName</span></div>
+                <div class="detail"><span class="detail-label">Email</span><span class="detail-value">@profile.Email</span></div>
+                <div class="detail"><span class="detail-label">Phone</span><span class="detail-value">@(string.IsNullOrWhiteSpace(profile.PhoneNumber) ? "—" : profile.PhoneNumber)</span></div>
+                <div class="detail"><span class="detail-label">Role</span><span class="detail-value">@profile.Role</span></div>
+                <div class="detail"><span class="detail-label">Account status</span>
+                    <span class="detail-value">
+                        <span class="status @(profile.IsActive ? "active" : "inactive")">@(profile.IsActive ? "Active" : "Inactive")</span>
+                    </span>
+                </div>
+                <div class="detail"><span class="detail-label">Member since</span><span class="detail-value">@profile.CreatedAt.ToString("MMMM d, yyyy")</span></div>
+                
+            </div>
+
+            <div class="profile-actions">
+                <button class="logout-btn" @onclick="LogOut">Log out</button>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+@code {
+    private ProfileModel? profile;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn) { Navigation.NavigateTo("/login"); return; }
+        try { profile = await ProfileService.GetProfileAsync(); }
+        finally { isLoading = false; }
+    }
+
+    private void LogOut()
+    {
+        // clears the in-memory session and the api token, goes to login
+        AuthState.Token = string.Empty;
+        AuthState.FullName = string.Empty;
+        AuthState.Role = string.Empty;
+        Http.DefaultRequestHeaders.Authorization = null;
+
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private static string Initials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        return string.Concat(name
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(w => char.ToUpperInvariant(w[0])));
+    }
+}

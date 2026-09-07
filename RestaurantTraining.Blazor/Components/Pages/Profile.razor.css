@@ -1,0 +1,39 @@
+.profile-page { padding: 32px 40px; color:#172033; max-width: 720px; }
+.eyebrow { color:#1c39bb; font-size:.8rem; font-weight:700; letter-spacing:.12em; margin:0; }
+.profile-page h1 { color:#12355b; margin:.35rem 0 1.25rem; font-size:2rem; }
+
+.loading-state, .empty-state {
+    padding:2.5rem; text-align:center; color:#64748b;
+    background:#fff; border:1px solid #e2e8f0; border-radius:12px;
+}
+.empty-state h3 { color:#12355b; margin:0 0 .5rem; }
+
+.profile-card {
+    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+    padding:26px 28px; box-shadow:0 3px 10px rgba(15,23,42,.04);
+}
+
+.profile-top { display:flex; align-items:center; gap:16px; padding-bottom:20px; border-bottom:1px solid #eef1f6; margin-bottom:20px; }
+.profile-avatar-lg {
+    width:66px; height:66px; flex-shrink:0; display:grid; place-items:center;
+    border-radius:50%; background:#1c39bb; color:#fff; font-size:1.4rem; font-weight:800;
+}
+.profile-top h2 { margin:0; color:#12355b; font-size:1.4rem; }
+.profile-role { margin:2px 0 0; color:#1c39bb; font-weight:600; font-size:.9rem; }
+
+.detail-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px 24px; }
+@media (max-width:600px){ .detail-grid{ grid-template-columns:1fr;} }
+.detail { display:flex; flex-direction:column; gap:3px; }
+.detail-label { color:#94a3b8; font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.detail-value { color:#12355b; font-size:.95rem; font-weight:500; word-break:break-word; }
+
+.status { display:inline-flex; padding:3px 10px; border-radius:999px; font-size:.78rem; font-weight:600; }
+.status.active { background:#dcfce7; color:#166534; }
+.status.inactive { background:#fef3c7; color:#92400e; }
+
+.profile-actions { margin-top:24px; padding-top:20px; border-top:1px solid #eef1f6; }
+.logout-btn {
+    padding:.7rem 1.4rem; border:1px solid #fecaca; border-radius:10px;
+    background:#fff; color:#b91c1c; font-weight:700; cursor:pointer; transition:.2s ease;
+}
+.logout-btn:hover { background:#fef2f2; }

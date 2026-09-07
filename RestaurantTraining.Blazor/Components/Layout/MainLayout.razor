@@ -1,0 +1,52 @@
+﻿@inherits LayoutComponentBase
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<div class="page">
+    <div class="sidebar">
+        @if (AuthState.Role == "Content Creator")
+        {
+            <ContentCreatorNavMenu />
+        }
+        else if (AuthState.IsLoggedIn)
+        {
+            <LearnerNavMenu />
+        }
+    </div>
+
+    <main>
+        <div class="top-row">
+            <div class="top-actions">
+                <div class="profile-summary" @onclick='() => Navigation.NavigateTo("/profile")' title="View profile">
+                    <span class="profile-avatar">@GetInitials()</span>
+                    <div>
+                        <strong>@AuthState.FullName</strong>
+                        <small>@AuthState.Role</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private string GetInitials()
+    {
+        if (string.IsNullOrWhiteSpace(AuthState.FullName)) return "CC";
+
+        return string.Concat(AuthState.FullName
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(word => char.ToUpperInvariant(word[0])));
+    }
+}
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

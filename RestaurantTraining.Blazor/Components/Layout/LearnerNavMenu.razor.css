@@ -1,0 +1,105 @@
+.sidebar {
+    width: 295px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-right: 1px solid #e5e9f0;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 4px 10px 34px;
+    color: #1c39bb;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.brand-logo {
+    width: 35px;
+    height: 35px;
+    border-radius: 9px;
+    background: #1c39bb;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+    .sidebar-nav ::deep .nav-item {
+        height: 46px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 0 13px;
+        box-sizing: border-box;
+        border-radius: 9px;
+        color: #667085;
+        background: transparent;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: 0.2s ease;
+    }
+
+        .sidebar-nav ::deep .nav-item:hover {
+            background: #edf1ff;
+            color: #1c39bb;
+            text-decoration: none;
+        }
+
+        .sidebar-nav ::deep .nav-item.active {
+            background: #e7ecff;
+            color: #1c39bb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+    .sidebar-nav ::deep .nav-icon {
+        width: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+    }
+
+    .sidebar-brand {
+        justify-content: center;
+        padding: 4px 0 30px;
+    }
+
+        .sidebar-brand span {
+            display: none;
+        }
+
+    .sidebar-nav ::deep .nav-item {
+        justify-content: center;
+        padding: 0;
+    }
+
+        .sidebar-nav ::deep .nav-item span:not(.nav-icon) {
+            display: none;
+        }
+}

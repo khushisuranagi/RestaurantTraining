@@ -1,0 +1,89 @@
+@page "/"
+@layout AuthLayout
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<div class="brand"></div>
+<div class="registration-page">
+    <div class="registration-card">
+        <h1>Create your staff account</h1>
+
+        <p class="subtitle">Choose your training role and sign in when you're done.</p>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <p class="message @(isSuccess ? "success-message" : "")">@message</p>
+        }
+        <div class="form-group"><label for="fullName">Full name</label><input id="fullName" @bind="fullName" placeholder="Enter your full name" /></div>
+        <div class="form-group"><label for="email">Email</label><input id="email" type="email" @bind="email" placeholder="name@example.com" /></div>
+        <div class="form-group"><label for="phone">Phone number <span>(optional)</span></label><input id="phone" type="tel" @bind="phoneNumber" placeholder="Enter your phone number" /></div>
+        <div class="form-group">
+            <label for="role">Training role</label>
+            <select id="role" @bind="roleId" disabled="@isLoadingRoles">
+                <option value="0">@(isLoadingRoles ? "Loading roles..." : "Select your role")</option>
+                @foreach (var role in roles) { <option value="@role.RoleId">@role.RoleName</option> }
+            </select>
+        </div>
+        <div class="form-group"><label for="password">Password</label>
+            <input id="password" type="password" @bind="password" placeholder="At least 8 characters" />
+            </div>
+
+        <div class="form-group"><label for="confirmPassword">Confirm password</label>
+            <input id="confirmPassword" type="password" @bind="confirmPassword" placeholder="Enter your password again" />
+            </div>
+
+        <button class="login-button" @onclick="HandleRegistration" disabled="@(isLoading || isLoadingRoles)">@(isLoading ? "Creating account..." : "Create account")</button>
+        <p class="register-link">Already have an account? <a href="/login">Log in</a></p>
+    </div>
+</div>
+
+@code {
+    private readonly List<RegistrationRole> roles = [];
+    private string fullName = string.Empty;
+    private string email = string.Empty;
+    private string phoneNumber = string.Empty;
+    private string password = string.Empty;
+    private string confirmPassword = string.Empty;
+    private int roleId;
+    private string message = string.Empty;
+    private bool isLoading;
+    private bool isLoadingRoles = true;
+    private bool isSuccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var availableRoles = await Http.GetFromJsonAsync<List<RegistrationRole>>("/api/Auth/registration-roles");
+            if (availableRoles != null) roles.AddRange(availableRoles);
+        }
+        catch { message = "Could not load the available roles. Please make sure the API is running."; }
+        finally { isLoadingRoles = false; }
+    }
+
+    private async Task HandleRegistration()
+    {
+        message = string.Empty;
+        isSuccess = false;
+        if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || roleId == 0)
+        {
+            message = "Please complete all required fields and choose a role.";
+            return;
+        }
+        isLoading = true;
+        try
+        {
+            var request = new { FullName = fullName, Email = email, PhoneNumber = phoneNumber, RoleId = roleId, Password = password, ConfirmPassword = confirmPassword };
+            var response = await Http.PostAsJsonAsync("/api/Auth/register", request);
+            var result = await response.Content.ReadFromJsonAsync<RegistrationResult>();
+            message = result?.Message ?? "We could not create your account. Please try again.";
+            isSuccess = result?.Success == true;
+            if (isSuccess) Navigation.NavigateTo("/");
+        }
+        catch { message = "Could not reach the server. Please make sure the API is running."; }
+        finally { isLoading = false; }
+    }
+}

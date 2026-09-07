@@ -1,0 +1,171 @@
+@page "/learning-modules/{ModuleId:int}"
+@using RestaurantTraining.Blazor.Services.LearnerDashboardManagement
+@using RestaurantTraining.Domain.Enums
+@inject ILearnerDashboardService LearnerDashboardService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Learning Module</PageTitle>
+
+<div class="learning-module-page">
+    <button class="back-button" @onclick='() => Navigation.NavigateTo("/learner-dashboard")'>← Back to dashboard</button>
+
+    @if (isLoading)
+    {
+        <p>Loading your lessons...</p>
+    }
+    else if (module is null)
+    {
+        <div class="empty-state"><h2>Module unavailable</h2><p>This module is no longer assigned to your role.</p></div>
+    }
+    else
+    {
+        <p class="eyebrow">TRAINING MODULE</p>
+        <h1>@module.ModuleName</h1>
+        <p class="module-description">@module.Description</p>
+
+        @if (module.Lessons.Count == 0)
+        {
+            <div class="empty-state"><p>There are no active lessons in this module yet.</p></div>
+        }
+        else
+        {
+            var lesson = module.Lessons[currentIndex];
+            var total = module.Lessons.Count;
+            var completed = module.Lessons.Count(l => l.IsCompleted);
+            var percent = total > 0 ? (int)Math.Round(100.0 * completed / total) : 0;
+
+            <div class="lesson-progress">
+                <div class="lesson-progress-top">
+                    <span>Lesson @(currentIndex + 1) of @total</span>
+                    <span>@completed of @total completed</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width:@(percent)%"></div></div>
+            </div>
+
+            <section class="lesson-card">
+                <h2>@lesson.LessonTitle @(lesson.IsCompleted ? "✓" : "")</h2>
+                @if (!string.IsNullOrWhiteSpace(lesson.Description)) { <p>@lesson.Description</p> }
+
+                @if (lesson.Resources.Count == 0)
+                {
+                    <p class="muted">Lesson material will be added soon.</p>
+                }
+                else
+                {
+                    @foreach (var resource in lesson.Resources)
+                    {
+                        <div class="learning-resource">
+
+                            
+                            @if (resource.ResourceType == (int)ResourceType.Video)
+                            {
+                                var embedUrl = GetYouTubeEmbedUrl(resource.ResourceUrl);
+                                @if (embedUrl is not null)
+                                  { <iframe class="resource-video" src="@embedUrl" title="@lesson.LessonTitle video" allowfullscreen></iframe> 
+                                  }
+                                else { <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer">Watch video →</a> }
+                            }
+                            else if (resource.ResourceType == (int)ResourceType.Image && HasFile(resource))
+                            {
+                                <img class="resource-image" src="@GetFileDataUrl(resource)" alt="@resource.FileName" />
+                            }
+                            else if (resource.ResourceType == (int)ResourceType.Pdf && HasFile(resource))
+                            {
+                                <iframe class="resource-pdf" src="@GetFileDataUrl(resource)" title="@resource.FileName"></iframe>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                            {
+                                <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer">Open lesson resource →</a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(resource.ContentText)) { <p>@resource.ContentText</p> }
+                        </div>
+                    }
+                }
+            </section>
+
+            <div class="lesson-nav">
+                <button class="lesson-prev" disabled="@(currentIndex == 0)" @onclick="Previous">← Previous</button>
+
+                @if (currentIndex < total - 1)
+                {
+                    <button class="lesson-next" disabled="@isSaving" @onclick="Next">
+                        @(isSaving ? "Saving..." : "Next →")
+                    </button>
+                }
+                else
+                {
+                    <button class="lesson-quiz" disabled="@isSaving" @onclick="TakeQuiz">
+                        @(isSaving ? "Saving..." : "Take Quiz →")
+                    </button>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public int ModuleId { get; set; }
+    private LearnerModuleContentModel? module;
+    private bool isLoading = true;
+    private bool isSaving;
+    private int currentIndex;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator") { Navigation.NavigateTo("/login"); return; }
+        try
+        {
+            module = await LearnerDashboardService.GetAssignedModuleAsync(ModuleId);
+
+            if (module is not null && module.Lessons.Count > 0)
+            {
+                var firstIncomplete = module.Lessons.FindIndex(l => !l.IsCompleted);
+                currentIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
+            }
+        }
+        finally { isLoading = false; }
+    }
+
+    private async Task MarkCurrentComplete()
+    {
+        if (module is null) return;
+        var lesson = module.Lessons[currentIndex];
+        if (lesson.IsCompleted) return;
+
+        isSaving = true;
+        try
+        {
+            var ok = await LearnerDashboardService.MarkLessonCompleteAsync(lesson.LessonId);
+            if (ok) lesson.IsCompleted = true;
+        }
+        finally { isSaving = false; }
+    }
+
+    private void Previous()
+    {
+        if (currentIndex > 0) currentIndex--;
+    }
+
+    private async Task Next()
+    {
+        await MarkCurrentComplete();
+        if (module is not null && currentIndex < module.Lessons.Count - 1) currentIndex++;
+    }
+
+    private async Task TakeQuiz()
+    {
+        await MarkCurrentComplete();
+        Navigation.NavigateTo($"/learner/quiz/{ModuleId}");
+    }
+
+    private static bool HasFile(LearnerLessonResourceModel r) => !string.IsNullOrWhiteSpace(r.FileData) && !string.IsNullOrWhiteSpace(r.ContentType);
+    private static string GetFileDataUrl(LearnerLessonResourceModel r) => $"data:{r.ContentType};base64,{r.FileData}";       //base64
+    private static string? GetYouTubeEmbedUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return null;
+        var id = url.Contains("youtu.be/") ? url.Split("youtu.be/")[1] : url.Contains("watch?v=") ? url.Split("watch?v=")[1] : string.Empty;
+        id = id.Split('?', '&')[0];
+        return string.IsNullOrWhiteSpace(id) ? null : $"https://www.youtube.com/embed/{id}";
+    }
+}
