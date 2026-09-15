@@ -15,9 +15,10 @@
         @* ---- Welcome banner ---- *@
         <div class="welcome-banner">
             <div>
-                <p class="welcome-hi">Welcome back!</p>
+                <p class="welcome-hi">
+                    @(AuthState.IsFirstLogin ? "Welcome! Let's start learning 👋" : "Welcome back!")
+                </p>
                 <h1>@AuthState.FullName</h1>
-               
             </div>
             <button class="continue-btn" @onclick="ContinueLearning">
                 Continue Learning →
@@ -62,7 +63,7 @@
         @* ---- Pending modules (started but not finished) ---- *@
         <div class="modules-panel">
             <div class="panel-head">
-                <h2>Pending Modules</h2>
+                <h2>In Progress</h2>
                 <a class="view-all" href="/learning-modules">View all</a>
             </div>
 

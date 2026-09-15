@@ -1,0 +1,113 @@
+﻿@page "/settings"
+@using RestaurantTraining.Blazor.Services
+
+
+<PageTitle>Account Settings</PageTitle>
+
+<div class="profile-page">
+
+    <p class="eyebrow">ACCOUNT</p>
+    <h1>Account Settings</h1>
+
+    <div class="profile-card">
+
+        <h2 class="settings-section-title">Change Password</h2>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <p class="message @(isSuccess ? "success-message" : "")">@message</p>
+        }
+
+        <div class="form-group">
+            <label>Current password</label>
+            <input type="password" @bind="currentPassword" placeholder="Enter your current password" />
+        </div>
+
+        <div class="form-group">
+            <label>New password</label>
+            <input type="password" @bind="newPassword" placeholder="At least 8 characters" />
+        </div>
+
+        <div class="form-group">
+            <label>Confirm new password</label>
+            <input type="password" @bind="confirmNewPassword" placeholder="Enter your new password again" />
+        </div>
+
+        <div class="profile-actions">
+            <button class="save-button" @onclick="HandleChangePassword" disabled="@isSaving">
+                @(isSaving ? "Saving..." : "Change Password")
+            </button>
+        </div>
+
+    </div>
+
+    <div class="profile-card">
+
+        <h2 class="settings-section-title">Update Email</h2>
+
+        @if (!string.IsNullOrEmpty(emailMessage))
+        {
+            <p class="message @(isEmailSuccess ? "success-message" : "")">@emailMessage</p>
+        }
+
+        <div class="form-group">
+            <label>Current password</label>
+            <input type="password" @bind="emailCurrentPassword" placeholder="Enter your current password" />
+        </div>
+
+        <div class="form-group">
+            <label>New email address</label>
+            <input type="email" @bind="newEmail" placeholder="name@example.com" />
+        </div>
+
+        <div class="profile-actions">
+            <button class="save-button" @onclick="HandleUpdateEmail" disabled="@isSavingEmail">
+                @(isSavingEmail ? "Saving..." : "Update Email")
+            </button>
+        </div>
+
+    </div>
+    <!-- END NEW BLOCK -->
+
+    <div class="profile-card danger-card">
+
+        <h2 class="settings-section-title danger-title">Delete Account</h2>
+        <p class="danger-note">
+            This permanently deletes your account and all your data — progress,
+            quiz attempts, and certificates. This cannot be undone.
+        </p>
+
+        @if (!string.IsNullOrEmpty(deleteMessage))
+        {
+            <p class="message @(isDeleteSuccess ? "success-message" : "")">@deleteMessage</p>
+        }
+
+        <div class="form-group">
+            <label>Current password</label>
+            <input type="password" @bind="deletePassword" placeholder="Enter your current password" />
+        </div>
+
+        @if (!showDeleteConfirm)
+        {
+            <div class="profile-actions">
+                <button class="delete-account-button" @onclick="StartDeleteConfirm">
+                    Delete my account
+                </button>
+            </div>
+        }
+        else
+        {
+            <p class="danger-confirm">Are you absolutely sure? This can't be undone.</p>
+            <div class="profile-actions danger-actions">
+                <button class="cancel-button" @onclick="CancelDelete" disabled="@isDeleting">
+                    Cancel
+                </button>
+                <button class="delete-account-button" @onclick="HandleDeleteAccount" disabled="@isDeleting">
+                    @(isDeleting ? "Deleting..." : "Yes, delete my account")
+                </button>
+            </div>
+        }
+
+    </div>
+
+</div>

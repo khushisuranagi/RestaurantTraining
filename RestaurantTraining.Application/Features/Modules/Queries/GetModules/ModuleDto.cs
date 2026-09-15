@@ -12,5 +12,7 @@ namespace RestaurantTraining.Application.Features.Modules.Queries.GetModules
         public bool IsActive { get; set; }
 
         public DateTime CreatedAt { get; set; }
+        public string? CoverImageData { get; set; }
+        public string? CoverImageContentType { get; set; }
     }
 }

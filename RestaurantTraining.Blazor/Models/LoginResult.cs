@@ -15,5 +15,6 @@ namespace RestaurantTraining.Blazor.Models
         public string Role { get; set; } = string.Empty;
 
         public string PhoneNumber { get; set; } = string.Empty;
+        public bool IsFirstLogin { get; set; }
     }
 }

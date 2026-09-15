@@ -9,13 +9,17 @@ public interface IModuleService
 
     Task<CreateModuleResult> CreateModuleAsync(
         string moduleName,
-        string description);
+        string description,
+        string? coverImageData = null,
+    string? coverImageContentType = null);
 
     Task<ApiResponse> UpdateModuleAsync(
         int moduleId,
         string moduleName,
         string description,
-        bool isActive);
+        bool isActive,
+        string? coverImageData = null,
+    string? coverImageContentType = null);
 
     Task<ApiResponse> DeleteModuleAsync(
         int moduleId);

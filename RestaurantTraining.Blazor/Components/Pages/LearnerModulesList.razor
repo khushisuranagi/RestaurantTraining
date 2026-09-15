@@ -13,70 +13,116 @@
     <p class="eyebrow">MY LEARNING</p>
     <h1>Learning Modules</h1>
 
+    <div class="module-search">
+        <span class="search-icon">⌕</span>
+        <input type="text"
+               placeholder="Search modules..."
+               @bind="searchText"
+               @bind:event="oninput" />
+    </div>
+
     @if (isLoading)
     {
         <p>Loading your modules...</p>
     }
     else
     {
-        var pending = modules.Where(m => m.HasStarted && !m.IsCompleted).ToList();
-        var assigned = modules.Where(m => !m.HasStarted).ToList();
-        var completed = modules.Where(m => m.IsCompleted).ToList();
+        var filtered = string.IsNullOrWhiteSpace(searchText)
+            ? modules
+            : modules.Where(MatchesSearch).ToList();
 
-        @*Pending (started, not finished) *@
-        <h2 class="section-title">Pending Modules <span class="count">@pending.Count</span></h2>
-        @if (pending.Count == 0)
+        var pending = filtered.Where(m => m.HasStarted && !m.IsCompleted).ToList();
+        var assigned = filtered.Where(m => !m.HasStarted).ToList();
+        var completed = filtered.Where(m => m.IsCompleted).ToList();
+
+        <div class="tab-bar">
+            <button class="tab-btn @(activeTab == Tab.InProgress ? "active" : "")"
+                    @onclick="() => activeTab = Tab.InProgress">
+                In Progress <span class="count">@pending.Count</span>
+            </button>
+            <button class="tab-btn @(activeTab == Tab.Assigned ? "active" : "")"
+                    @onclick="() => activeTab = Tab.Assigned">
+                Assigned Modules <span class="count">@assigned.Count</span>
+            </button>
+            <button class="tab-btn @(activeTab == Tab.Completed ? "active" : "")"
+                    @onclick="() => activeTab = Tab.Completed">
+                Completed <span class="count">@completed.Count</span>
+            </button>
+        </div>
+
+        @if (activeTab == Tab.InProgress)
         {
-            <div class="empty-row">Nothing in progress right now.</div>
-        }
-        else
-        {
-            @foreach (var m in pending)
+            @if (pending.Count == 0)
             {
-                <div class="mod-row">
-                    <span class="mod-thumb">📖</span>
-                    <div class="mod-main">
-                        <h3>@m.ModuleName</h3>
-                        <div class="progress-track"><div class="progress-fill" style="width:@(m.ProgressPercent)%"></div></div>
-                    </div>
-                    <span class="mod-percent">@m.ProgressPercent%</span>
-                    <button class="mod-btn continue" @onclick="() => Open(m.ModuleId)">Continue →</button>
+                <div class="empty-row">Nothing in progress right now.</div>
+            }
+            else
+            {
+                <div class="mod-card-grid">
+                    @foreach (var m in pending)
+                    {
+                        <div class="mod-card" @onclick="() => Open(m.ModuleId)">
+                            @RenderThumb(m, "📖")
+                            <div class="mod-card-body">
+                                <h3>@m.ModuleName</h3>
+                                <div class="progress-track"><div class="progress-fill" style="width:@(m.ProgressPercent)%"></div></div>
+                                <div class="mod-card-footer">
+                                    <span class="mod-percent">@m.ProgressPercent% complete</span>
+                                    <button class="mod-btn continue" @onclick:stopPropagation="true" @onclick="() => Open(m.ModuleId)">Continue →</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         }
-
-        @* ---- Assigned (not started yet) ---- *@
-        <h2 class="section-title">Assigned Modules <span class="count">@assigned.Count</span></h2>
-        @if (assigned.Count == 0)
+        else if (activeTab == Tab.Assigned)
         {
-            <div class="empty-row">No new modules to start.</div>
-        }
-        else
-        {
-            @foreach (var m in assigned)
+            @if (assigned.Count == 0)
             {
-                <div class="mod-row">
-                    <span class="mod-thumb">📗</span>
-                    <div class="mod-main">
-                        <h3>@m.ModuleName</h3>
-                        <p class="mod-desc">@(string.IsNullOrWhiteSpace(m.Description) ? "Ready to start." : m.Description)</p>
-                    </div>
-                    <button class="mod-btn start" @onclick="() => Open(m.ModuleId)">Start</button>
+                <div class="empty-row">No new modules to start.</div>
+            }
+            else
+            {
+                <div class="mod-card-grid">
+                    @foreach (var m in assigned)
+                    {
+                        <div class="mod-card" @onclick="() => Open(m.ModuleId)">
+                            @RenderThumb(m, "📗")
+                            <div class="mod-card-body">
+                                <h3>@m.ModuleName</h3>
+                                <p class="mod-desc">@(string.IsNullOrWhiteSpace(m.Description) ? "Ready to start." : m.Description)</p>
+                                <div class="mod-card-footer">
+                                    <button class="mod-btn start" @onclick:stopPropagation="true" @onclick="() => Open(m.ModuleId)">Start</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         }
-
-        @* ---- Completed ---- *@
-        @if (completed.Count > 0)
+        else if (activeTab == Tab.Completed)
         {
-            <h2 class="section-title">Completed <span class="count">@completed.Count</span></h2>
-            @foreach (var m in completed)
+            @if (completed.Count == 0)
             {
-                <div class="mod-row">
-                    <span class="mod-thumb">✅</span>
-                    <div class="mod-main"><h3>@m.ModuleName</h3></div>
-                    <span class="mod-done">Completed</span>
-                    <button class="mod-btn review" @onclick="() => Open(m.ModuleId)">Review</button>
+                <div class="empty-row">No completed modules yet.</div>
+            }
+            else
+            {
+                <div class="mod-card-grid">
+                    @foreach (var m in completed)
+                    {
+                        <div class="mod-card" @onclick="() => Open(m.ModuleId)">
+                            @RenderThumb(m, "✅")
+                            <div class="mod-card-body">
+                                <h3>@m.ModuleName</h3>
+                                <div class="mod-card-footer">
+                                    <span class="mod-done">Completed</span>
+                                    <button class="mod-btn review" @onclick:stopPropagation="true" @onclick="() => Open(m.ModuleId)">Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         }
@@ -85,15 +131,57 @@
 </div>
 
 @code {
+    private enum Tab { InProgress, Assigned, Completed }
+
     private List<LearnerModuleOverviewModel> modules = [];
     private bool isLoading = true;
+    private Tab activeTab = Tab.InProgress;
+    private string searchText = string.Empty;
+
+    // Matches a module by name or description (case-insensitive).
+    private bool MatchesSearch(LearnerModuleOverviewModel m)
+    {
+        var q = searchText.Trim();
+        return m.ModuleName.Contains(q, StringComparison.OrdinalIgnoreCase)
+            || (!string.IsNullOrWhiteSpace(m.Description)
+                && m.Description.Contains(q, StringComparison.OrdinalIgnoreCase));
+    }
 
     protected override async Task OnInitializedAsync()
     {
         if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator") { Navigation.NavigateTo("/login"); return; }
-        try { modules = await LearnerDashboardService.GetModulesOverviewAsync(); }
+        try
+        {
+            modules = await LearnerDashboardService.GetModulesOverviewAsync();
+
+            var hasPending = modules.Any(m => m.HasStarted && !m.IsCompleted);
+            var hasAssigned = modules.Any(m => !m.HasStarted);
+
+            activeTab = hasPending ? Tab.InProgress
+                : hasAssigned ? Tab.Assigned
+                : Tab.Completed;
+        }
         finally { isLoading = false; }
     }
 
     private void Open(int moduleId) => Navigation.NavigateTo($"/learning-modules/{moduleId}");
+
+    private RenderFragment RenderThumb(LearnerModuleOverviewModel m, string fallbackEmoji) => builder =>
+    {
+        if (!string.IsNullOrWhiteSpace(m.CoverImageData) && !string.IsNullOrWhiteSpace(m.CoverImageContentType))
+        {
+            builder.OpenElement(0, "img");
+            builder.AddAttribute(1, "class", "mod-card-thumb-img");
+            builder.AddAttribute(2, "src", $"data:{m.CoverImageContentType};base64,{m.CoverImageData}");
+            builder.AddAttribute(3, "alt", m.ModuleName);
+            builder.CloseElement();
+        }
+        else
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "mod-card-thumb-fallback");
+            builder.AddContent(2, fallbackEmoji);
+            builder.CloseElement();
+        }
+    };
 }

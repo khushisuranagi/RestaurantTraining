@@ -192,6 +192,24 @@
             @if (IsMcq)
             {
                 <div class="form-group">
+                    <label>Answer Selection</label>
+
+                    <label class="radio-row">
+                        <input type="radio" name="answerMode"
+                               checked="@(!allowMultipleAnswers)"
+                               @onchange="() => allowMultipleAnswers = false" />
+                        Single answer (radio buttons)
+                    </label>
+
+                    <label class="radio-row">
+                        <input type="radio" name="answerMode"
+                               checked="@allowMultipleAnswers"
+                               @onchange="() => allowMultipleAnswers = true" />
+                        Multiple answers (checkboxes)
+                    </label>
+                </div>
+
+                <div class="form-group">
                     <label>Answer Options</label>
 
                     @foreach (var row in optionRows)

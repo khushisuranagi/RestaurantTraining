@@ -31,7 +31,9 @@ namespace RestaurantTraining.Application.Features.Modules.Queries.GetModules
                     ModuleName = module.ModuleName,
                     Description = module.Description,
                     IsActive = module.IsActive,
-                    CreatedAt = module.CreatedAt
+                    CreatedAt = module.CreatedAt,
+                    CoverImageData = module.CoverImageData,
+                    CoverImageContentType = module.CoverImageContentType
                 });
             }
 

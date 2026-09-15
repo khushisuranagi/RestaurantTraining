@@ -22,5 +22,18 @@ namespace RestaurantTraining.Application.Common.Interfaces
         Task AddUserAsync(
             User user,
             CancellationToken cancellationToken);
+
+        Task UpdateUserAsync(
+             User user,
+             CancellationToken cancellationToken);
+
+        Task<User?> GetUserByIdAsync(
+    int userId,
+    CancellationToken cancellationToken);
+
+        // Permanently deletes the user and every row that references them.
+        Task DeleteAccountAsync(
+            int userId,
+            CancellationToken cancellationToken);
     }
 }

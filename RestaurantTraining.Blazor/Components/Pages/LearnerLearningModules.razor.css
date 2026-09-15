@@ -32,3 +32,130 @@ h1 { color: #12355b; margin: .25rem 0 .5rem; }
 .lesson-quiz { border:none; background:#16a34a; color:#fff; }
 .lesson-quiz:hover { background:#15803d; }
 .lesson-next:disabled, .lesson-quiz:disabled { opacity:.6; cursor:not-allowed; }
+
+
+.article-preview-card {
+    display: flex;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+    .article-preview-card:hover {
+        border-color: #2b3a8f;
+        box-shadow: 0 2px 10px rgba(43, 58, 143, 0.12);
+    }
+
+    .article-preview-card.loading {
+        padding: 16px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+.article-preview-image {
+    width: 140px;
+    height: 100px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.article-preview-text {
+    padding: 12px 14px 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.article-preview-site {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+}
+
+.article-preview-title {
+    font-size: 15px;
+    color: #1a2340;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.article-preview-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.docx-preview {
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: #ffffff;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1a2340;
+}
+
+    .docx-preview p {
+        margin: 0 0 12px 0;
+    }
+
+    .docx-preview h1,
+    .docx-preview h2,
+    .docx-preview h3 {
+        margin: 16px 0 8px 0;
+        color: #1a2340;
+    }
+
+    .docx-preview ul,
+    .docx-preview ol {
+        margin: 0 0 12px 0;
+        padding-left: 24px;
+    }
+
+    .docx-preview table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+    }
+
+        .docx-preview table td,
+        .docx-preview table th {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+        }
+
+    .docx-preview img {
+        max-width: 100%;
+        height: auto;
+    }
+
+.text-preview {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f9fafb;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #1a2340;
+}

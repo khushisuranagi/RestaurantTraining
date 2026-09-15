@@ -1,10 +1,9 @@
 @page "/profile"
-@using System.Net.Http.Headers
+@using RestaurantTraining.Blazor.Models
 @using RestaurantTraining.Blazor.Services
 @using RestaurantTraining.Blazor.Services.ProfileManagement
-@inject IProfileService ProfileService 
+@inject IProfileService ProfileService
 @inject AuthState AuthState
-@inject HttpClient Http
 @inject NavigationManager Navigation
 
 <PageTitle>My Profile</PageTitle>
@@ -28,29 +27,57 @@
 
             <div class="profile-top">
                 <span class="profile-avatar-lg">@Initials(profile.FullName)</span>
-                <div>
+                <div class="profile-top-text">
                     <h2>@profile.FullName</h2>
                     <p class="profile-role">@profile.Role</p>
                 </div>
+
+                @if (!isEditing)
+                {
+                    <button class="edit-btn" @onclick="StartEdit">Edit</button>
+                }
             </div>
 
-            <div class="detail-grid">
-                <div class="detail"><span class="detail-label">Full name</span><span class="detail-value">@profile.FullName</span></div>
-                <div class="detail"><span class="detail-label">Email</span><span class="detail-value">@profile.Email</span></div>
-                <div class="detail"><span class="detail-label">Phone</span><span class="detail-value">@(string.IsNullOrWhiteSpace(profile.PhoneNumber) ? "—" : profile.PhoneNumber)</span></div>
-                <div class="detail"><span class="detail-label">Role</span><span class="detail-value">@profile.Role</span></div>
-                <div class="detail"><span class="detail-label">Account status</span>
-                    <span class="detail-value">
-                        <span class="status @(profile.IsActive ? "active" : "inactive")">@(profile.IsActive ? "Active" : "Inactive")</span>
-                    </span>
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <p class="profile-message @(isSuccess ? "success" : "")">@message</p>
+            }
+
+            @if (!isEditing)
+            {
+                <div class="detail-grid">
+                    <div class="detail"><span class="detail-label">Full name</span><span class="detail-value">@profile.FullName</span></div>
+                    <div class="detail"><span class="detail-label">Email</span><span class="detail-value">@profile.Email</span></div>
+                    <div class="detail"><span class="detail-label">Phone</span><span class="detail-value">@(string.IsNullOrWhiteSpace(profile.PhoneNumber) ? "—" : profile.PhoneNumber)</span></div>
+                    <div class="detail"><span class="detail-label">Role</span><span class="detail-value">@profile.Role</span></div>
+                    <div class="detail">
+                        <span class="detail-label">Account status</span>
+                        <span class="detail-value">
+                            <span class="status @(profile.IsActive ? "active" : "inactive")">@(profile.IsActive ? "Active" : "Inactive")</span>
+                        </span>
+                    </div>
+                    <div class="detail"><span class="detail-label">Member since</span><span class="detail-value">@profile.CreatedAt.ToString("MMMM d, yyyy")</span></div>
+                    <div class="detail"><span class="detail-label">Last login</span><span class="detail-value">@(profile.LastLoginAt is null ? "—" : profile.LastLoginAt.Value.ToString("MMMM d, yyyy h:mm tt"))</span></div>
                 </div>
-                <div class="detail"><span class="detail-label">Member since</span><span class="detail-value">@profile.CreatedAt.ToString("MMMM d, yyyy")</span></div>
-                
-            </div>
+            }
+            else
+            {
+                <div class="edit-grid">
+                    <div class="form-group">
+                        <label>Full name</label>
+                        <input type="text" @bind="editFullName" placeholder="Enter your full name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" @bind="editPhoneNumber" placeholder="Enter your phone number" />
+                    </div>
+                </div>
 
-            <div class="profile-actions">
-                <button class="logout-btn" @onclick="LogOut">Log out</button>
-            </div>
+                <div class="edit-actions">
+                    <button class="cancel-btn" @onclick="CancelEdit" disabled="@isSaving">Cancel</button>
+                    <button class="save-btn" @onclick="SaveEdit" disabled="@isSaving">@(isSaving ? "Saving..." : "Save changes")</button>
+                </div>
+            }
 
         </div>
     }
@@ -61,6 +88,14 @@
     private ProfileModel? profile;
     private bool isLoading = true;
 
+    private bool isEditing;
+    private bool isSaving;
+    private string editFullName = string.Empty;
+    private string editPhoneNumber = string.Empty;
+
+    private string message = string.Empty;
+    private bool isSuccess;
+
     protected override async Task OnInitializedAsync()
     {
         if (!AuthState.IsLoggedIn) { Navigation.NavigateTo("/login"); return; }
@@ -68,15 +103,64 @@
         finally { isLoading = false; }
     }
 
-    private void LogOut()
+    private void StartEdit()
     {
-        // clears the in-memory session and the api token, goes to login
-        AuthState.Token = string.Empty;
-        AuthState.FullName = string.Empty;
-        AuthState.Role = string.Empty;
-        Http.DefaultRequestHeaders.Authorization = null;
+        if (profile is null) return;
+        editFullName = profile.FullName;
+        editPhoneNumber = profile.PhoneNumber;
+        message = string.Empty;
+        isEditing = true;
+    }
 
-        Navigation.NavigateTo("/login", forceLoad: true);
+    private void CancelEdit()
+    {
+        isEditing = false;
+        message = string.Empty;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (profile is null) return;
+
+        if (string.IsNullOrWhiteSpace(editFullName))
+        {
+            isSuccess = false;
+            message = "Full name is required.";
+            return;
+        }
+
+        isSaving = true;
+        message = string.Empty;
+
+        try
+        {
+            var result = await ProfileService.UpdateProfileAsync(new UpdateProfileRequest
+            {
+                FullName = editFullName.Trim(),
+                PhoneNumber = editPhoneNumber?.Trim() ?? string.Empty
+            });
+
+            isSuccess = result.Success;
+            message = result.Message;
+
+            if (result.Success)
+            {
+                // Reflect the change on screen and in the top bar.
+                profile.FullName = editFullName.Trim();
+                profile.PhoneNumber = editPhoneNumber?.Trim() ?? string.Empty;
+                AuthState.FullName = profile.FullName;
+                isEditing = false;
+            }
+        }
+        catch
+        {
+            isSuccess = false;
+            message = "Something went wrong while saving your profile.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
     }
 
     private static string Initials(string name)

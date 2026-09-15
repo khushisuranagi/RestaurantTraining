@@ -1,0 +1,109 @@
+@page "/explore"
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.LearnerExplore
+@inject IExploreService ExploreService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Explore</PageTitle>
+
+<div class="explore-page">
+
+    <p class="eyebrow">EXPLORE</p>
+    <h1>Explore Modules</h1>
+    <p class="explore-intro">
+        Optional modules beyond your role. Learn anything that interests you —
+        these don't affect your assigned training.
+    </p>
+
+    <div class="module-search">
+        <span class="search-icon">⌕</span>
+        <input type="text"
+               placeholder="Search modules..."
+               @bind="searchText"
+               @bind:event="oninput" />
+    </div>
+
+    @if (isLoading)
+    {
+        <p>Loading modules...</p>
+    }
+    else
+    {
+        var filtered = string.IsNullOrWhiteSpace(searchText)
+            ? modules
+            : modules.Where(MatchesSearch).ToList();
+
+        @if (filtered.Count == 0)
+        {
+            <div class="empty-row">
+                @(modules.Count == 0
+                    ? "There are no other modules to explore right now."
+                    : "No modules match your search.")
+            </div>
+        }
+        else
+        {
+            <div class="mod-card-grid">
+                @foreach (var m in filtered)
+                {
+                    <div class="mod-card" @onclick="() => Open(m.ModuleId)">
+                        @RenderThumb(m)
+                        <div class="mod-card-body">
+                            <h3>@m.ModuleName</h3>
+                            <p class="mod-desc">@(string.IsNullOrWhiteSpace(m.Description) ? "Optional module." : m.Description)</p>
+                            <div class="mod-card-footer">
+                                <button class="mod-btn start" @onclick:stopPropagation="true" @onclick="() => Open(m.ModuleId)">Explore</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+
+</div>
+
+@code {
+    private List<ExploreModuleModel> modules = [];
+    private bool isLoading = true;
+    private string searchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator") { Navigation.NavigateTo("/login"); return; }
+        try { modules = await ExploreService.GetExploreModulesAsync(); }
+        finally { isLoading = false; }
+    }
+
+    private void Open(int moduleId) => Navigation.NavigateTo($"/explore/{moduleId}");
+
+    // Matches a module by name or description (case-insensitive).
+    private bool MatchesSearch(ExploreModuleModel m)
+    {
+        var q = searchText.Trim();
+        return m.ModuleName.Contains(q, StringComparison.OrdinalIgnoreCase)
+            || (!string.IsNullOrWhiteSpace(m.Description)
+                && m.Description.Contains(q, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private RenderFragment RenderThumb(ExploreModuleModel m) => builder =>
+    {
+        if (!string.IsNullOrWhiteSpace(m.CoverImageData) && !string.IsNullOrWhiteSpace(m.CoverImageContentType))
+        {
+            builder.OpenElement(0, "img");
+            builder.AddAttribute(1, "class", "mod-card-thumb-img");
+            builder.AddAttribute(2, "src", $"data:{m.CoverImageContentType};base64,{m.CoverImageData}");
+            builder.AddAttribute(3, "alt", m.ModuleName);
+            builder.CloseElement();
+        }
+        else
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "mod-card-thumb-fallback");
+            builder.AddContent(2, "✦");
+            builder.CloseElement();
+        }
+    };
+}

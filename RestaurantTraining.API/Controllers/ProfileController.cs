@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantTraining.Application.Features.Profile.Commands.UpdateProfile;
 using RestaurantTraining.Application.Features.Profile.Queries.GetProfile;
 
 namespace RestaurantTraining.API.Controllers;
@@ -33,5 +34,20 @@ public class ProfileController : ControllerBase
         var result = await _mediator.Send(new GetProfileQuery { UserId = userId.Value });
 
         return result is null ? NotFound() : Ok(result);
+    }
+
+    // PUT /api/profile  update the signed-in user's own name & phone
+    [HttpPut]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Forbid();
+
+        // The user id always comes from the token, never the request body.
+        command.UserId = userId.Value;
+
+        var result = await _mediator.Send(command);
+
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 }

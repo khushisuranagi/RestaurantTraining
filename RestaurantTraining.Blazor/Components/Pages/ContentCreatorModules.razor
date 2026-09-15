@@ -285,7 +285,7 @@
                         <h3>No resources yet</h3>
 
                         <p>
-                            Add a video, image, article, or PDF to this lesson.
+                            Add a video, image, article, or text file to this lesson.
                         </p>
 
                     </div>
@@ -400,7 +400,25 @@
                               placeholder="Enter module description"></textarea>
 
                 </div>
+                <div class="form-group">
+                    <label>Cover Image</label>
 
+                    <InputFile OnChange="HandleModuleImageSelected" accept="image/*" />
+
+                    @if (selectedModuleImageFile != null)
+                    {
+                        <p class="selected-file">@selectedModuleImageFile.Name</p>
+                    }
+                    else if (moduleHasExistingImage)
+                    {
+                        <p class="field-hint">A cover image is already set. Choose a new one to replace it.</p>
+                    }
+                    else
+                    {
+                        <p class="field-hint">Optional — add a cover image for the learner grid view.</p>
+                    }
+                </div>
+                
 
                 <!-- ROLE ASSIGNMENT -->
 
@@ -544,12 +562,98 @@
 
                 </div>
 
+                @* ---- Optional resource (only when adding a new lesson) ---- *@
+               
 
+    <hr class="form-divider" />
+
+    <div class="form-group">
+        <label>Lesson Resources</label>
+        <p class="field-hint">
+                        Add, edit, or remove videos, articles, images, or documents for this lesson.
+        </p>
+    </div>
+
+    @foreach (var row in lessonResourceRows)
+    {
+        <div class="resource-row-block">
+
+            <div class="form-group">
+                <label>Resource Type</label>
+                <select @bind="row.Type">
+                    @foreach (var type in Enum.GetValues<ResourceType>())
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </select>
+            </div>
+
+            @if (row.Type == ResourceType.Video)
+            {
+                <div class="form-group">
+                    <label>Video URL</label>
+                    <input type="url" @bind="row.Url" placeholder="Paste video URL" />
+                </div>
+            }
+
+            @if (row.Type == ResourceType.Article)
+            {
+                <div class="form-group">
+                    <label>Article URL</label>
+                    <input type="url" @bind="row.Url" placeholder="Paste article URL" />
+                </div>
+            }
+
+            @if (row.Type == ResourceType.Document)
+            {
+                <div class="form-group">
+                    <label>Text File</label>
+                    <InputFile OnChange="e => HandleLessonResourceFileSelected(e, row)"
+                                           accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" />
+                    @if (!string.IsNullOrWhiteSpace(row.FileName))
+                    {
+                        <p class="selected-file">@row.FileName</p>
+                    }
+                </div>
+            }
+
+            @if (row.Type == ResourceType.Image)
+            {
+                <div class="form-group">
+                    <label>Image File</label>
+                    <InputFile OnChange="e => HandleLessonResourceFileSelected(e, row)"
+                               accept="image/*" />
+                    @if (!string.IsNullOrWhiteSpace(row.FileName))
+                    {
+                        <p class="selected-file">@row.FileName</p>
+                    }
+                </div>
+            }
+                   @if (row.HasExistingFile && (row.Type == ResourceType.Document || row.Type == ResourceType.Image))
+                        {
+                            <p class="selected-file">Current file on record — leave blank to keep it, or choose a new one to replace it.</p>
+                        }
+                <button type="button" class="option-remove"
+                        @onclick="() => RemoveLessonResourceRow(row)">
+                    Remove Resource
+                </button>
+            
+
+            <hr class="form-divider" />
+        </div>
+    }
+
+    <button type="button" class="add-option-button" @onclick="AddLessonResourceRow">
+        + Add Another Resource
+    </button>
+
+                  
                 @if (editingLesson != null)
                 {
                     <div class="form-group">
 
                         <label>Status</label>
+
 
                         <select @bind="LessonStatus">
 
@@ -670,14 +774,15 @@
                 }
 
 
-                @if (resourceType == ResourceType.Pdf)
+                @if (resourceType == ResourceType.Document)
+
                 {
                     <div class="form-group">
 
-                        <label>PDF File</label>
+                        <label>Text File</label>
 
                         <InputFile OnChange="HandleResourceFileSelected"
-                                   accept=".pdf,application/pdf" />
+                                   accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" />
 
                         @if (selectedResourceFile != null)
                         {

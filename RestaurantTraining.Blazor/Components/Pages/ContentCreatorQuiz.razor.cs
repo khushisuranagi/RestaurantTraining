@@ -71,7 +71,7 @@ public partial class ContentCreatorQuiz
     private int marks = 5;
     private string explanation = string.Empty;
     private string imageUrl = string.Empty;
-
+    private bool allowMultipleAnswers;
     //  answer options 
     private List<OptionEditRow> optionRows = [];
 
@@ -232,7 +232,8 @@ public partial class ContentCreatorQuiz
         explanation = string.Empty;
         imageUrl = string.Empty;
 
-       
+        allowMultipleAnswers = false;
+
         optionRows =
         [
             new OptionEditRow(),
@@ -243,6 +244,7 @@ public partial class ContentCreatorQuiz
 
         saveError = string.Empty;
         showQuestionModal = true;
+
     }
 
 
@@ -256,6 +258,7 @@ public partial class ContentCreatorQuiz
         marks = question.Marks;
         explanation = question.Explanation;
         imageUrl = question.ImageUrl;
+        allowMultipleAnswers = question.AllowMultipleAnswers;
 
         // Load this question's existing options into editable rows.
         var allOptions = await QuizService.GetOptionsAsync();
@@ -339,6 +342,12 @@ public partial class ContentCreatorQuiz
                 saveError = "Please mark at least one option as correct.";
                 return;
             }
+            if (!allowMultipleAnswers && optionsToSave.Count(x => x.IsCorrect) > 1)
+            {
+                saveError = "Single-answer questions can only have one correct option.";
+                return;
+            }
+
         }
         else if (IsTrueFalse)
         {
@@ -382,6 +391,7 @@ public partial class ContentCreatorQuiz
                 ModuleId = ModuleId,
                 QuestionText = questionText,
                 QuestionType = questionType,
+                AllowMultipleAnswers = allowMultipleAnswers,
                 ImageUrl = imageUrl,
                 Explanation = explanation,
                 Marks = marks

@@ -8,5 +8,7 @@ namespace RestaurantTraining.Application.Features.Modules.Commands.CreateModule
         public string ModuleName { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
+        public string? CoverImageData { get; set; }
+        public string? CoverImageContentType { get; set; }
     }
 }

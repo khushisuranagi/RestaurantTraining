@@ -1,0 +1,179 @@
+@page "/explore/{ModuleId:int}"
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.LearnerExplore
+@using RestaurantTraining.Domain.Enums
+@inject IExploreService ExploreService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Explore Module</PageTitle>
+
+<div class="learning-module-page">
+    <button class="back-button" @onclick='() => Navigation.NavigateTo("/explore")'>← Back to Explore</button>
+
+    @if (isLoading)
+    {
+        <p>Loading lessons...</p>
+    }
+    else if (module is null)
+    {
+        <div class="empty-state"><h2>Module unavailable</h2><p>This module is no longer available.</p></div>
+    }
+    else
+    {
+        <p class="eyebrow">OPTIONAL MODULE</p>
+        <h1>@module.ModuleName</h1>
+        <p class="module-description">@module.Description</p>
+
+        @if (module.Lessons.Count == 0)
+        {
+            <div class="empty-state"><p>There are no active lessons in this module yet.</p></div>
+        }
+        else
+        {
+            var lesson = module.Lessons[currentIndex];
+            var total = module.Lessons.Count;
+
+            <div class="lesson-progress">
+                <div class="lesson-progress-top">
+                    <span>Lesson @(currentIndex + 1) of @total</span>
+                </div>
+            </div>
+
+            <section class="lesson-card">
+                <h2>@lesson.LessonTitle</h2>
+                @if (!string.IsNullOrWhiteSpace(lesson.Description)) { <p>@lesson.Description</p> }
+
+                @if (lesson.Resources.Count == 0)
+                {
+                    <p class="muted">Lesson material will be added soon.</p>
+                }
+                else
+                {
+                    @foreach (var resource in lesson.Resources)
+                    {
+                        <div class="learning-resource">
+
+                            @if (resource.ResourceType == (int)ResourceType.Video)
+                            {
+                                var embedUrl = GetYouTubeEmbedUrl(resource.ResourceUrl);
+                                @if (embedUrl is not null)
+                                {
+                                    <iframe class="resource-video" src="@embedUrl" title="@lesson.LessonTitle video" allowfullscreen></iframe>
+                                }
+                                else { <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer">Watch video →</a> }
+                            }
+                            else if (resource.ResourceType == (int)ResourceType.Image && HasFile(resource))
+                            {
+                                <img class="resource-image" src="@GetFileDataUrl(resource)" alt="@resource.FileName" />
+                            }
+                            else if (resource.ResourceType == (int)ResourceType.Document && HasFile(resource))
+                            {
+                                @if (IsPdf(resource.ContentType))
+                                {
+                                    <iframe class="resource-pdf" src="@GetFileDataUrl(resource)" title="@resource.FileName"></iframe>
+                                }
+                                else if (IsDocx(resource.ContentType))
+                                {
+                                    <div id="docx-preview-@resource.ResourceId" class="docx-preview">Loading document...</div>
+                                }
+                                else if (IsPlainText(resource.ContentType))
+                                {
+                                    <pre class="text-preview">@GetPlainTextContent(resource)</pre>
+                                }
+                                else
+                                {
+                                    <a class="resource-link" href="@GetFileDataUrl(resource)" download="@resource.FileName">
+                                        📄 Download @resource.FileName
+                                    </a>
+                                }
+                            }
+                            else if (resource.ResourceType == (int)ResourceType.Article && !string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                            {
+                                <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer">Open article →</a>
+                            }
+                        </div>
+                    }
+                }
+            </section>
+
+            <div class="lesson-nav">
+                <button class="lesson-prev" disabled="@(currentIndex == 0)" @onclick="Previous">← Previous</button>
+
+                @if (currentIndex < total - 1)
+                {
+                    <button class="lesson-next" @onclick="Next">Next →</button>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public int ModuleId { get; set; }
+    private LearnerModuleContentModel? module;
+    private bool isLoading = true;
+    private int currentIndex;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator") { Navigation.NavigateTo("/login"); return; }
+        try { module = await ExploreService.GetExploreModuleAsync(ModuleId); }
+        finally { isLoading = false; }
+    }
+
+    private void Previous()
+    {
+        if (currentIndex > 0) currentIndex--;
+    }
+
+    private void Next()
+    {
+        if (module is not null && currentIndex < module.Lessons.Count - 1) currentIndex++;
+    }
+
+    private static bool HasFile(LearnerLessonResourceModel r) => !string.IsNullOrWhiteSpace(r.FileData) && !string.IsNullOrWhiteSpace(r.ContentType);
+    private static string GetFileDataUrl(LearnerLessonResourceModel r) => $"data:{r.ContentType};base64,{r.FileData}";
+    private static string? GetYouTubeEmbedUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return null;
+        var id = url.Contains("youtu.be/") ? url.Split("youtu.be/")[1] : url.Contains("watch?v=") ? url.Split("watch?v=")[1] : string.Empty;
+        id = id.Split('?', '&')[0];
+        return string.IsNullOrWhiteSpace(id) ? null : $"https://www.youtube.com/embed/{id}";
+    }
+
+    private static string GetPlainTextContent(LearnerLessonResourceModel r)
+    {
+        if (string.IsNullOrWhiteSpace(r.FileData)) return string.Empty;
+        var bytes = Convert.FromBase64String(r.FileData);
+        return System.Text.Encoding.UTF8.GetString(bytes);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (module is null || module.Lessons.Count == 0) return;
+
+        var lesson = module.Lessons[currentIndex];
+        var docxResources = lesson.Resources
+            .Where(r => r.ResourceType == (int)ResourceType.Document
+                && HasFile(r) && IsDocx(r.ContentType))
+            .ToList();
+
+        foreach (var resource in docxResources)
+        {
+            if (docxRendered.Contains(resource.ResourceId)) continue;
+
+            docxRendered.Add(resource.ResourceId);
+            await JS.InvokeVoidAsync("renderDocxPreview",
+                $"docx-preview-{resource.ResourceId}", resource.FileData);
+        }
+    }
+
+    private static bool IsPdf(string? contentType) => contentType == "application/pdf";
+    private static bool IsDocx(string? contentType) => contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    private static bool IsPlainText(string? contentType) => contentType == "text/plain";
+
+    private HashSet<int> docxRendered = new();
+}

@@ -36,6 +36,7 @@ namespace RestaurantTraining.Persistence.Repositories
                     QuestionText = q.QuestionText,
                     QuestionType = (int)q.QuestionType,
                     Marks = q.Marks,
+                    AllowMultipleAnswers = q.AllowMultipleAnswers,
                     Options = _context.QuizOptions
                         .Where(o => o.QuestionId == q.QuestionId)
                         .Select(o => new QuizOptionInfo

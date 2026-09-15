@@ -81,6 +81,38 @@ namespace RestaurantTraining.Persistence.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
+
+
+        public async Task RecordModuleOpenedAsync(
+    int userId, int moduleId, CancellationToken cancellationToken)
+        {
+            var now = DateTime.UtcNow;
+
+            var moduleProgress = await _context.ModuleProgress
+                .FirstOrDefaultAsync(
+                    mp => mp.UserId == userId && mp.ModuleId == moduleId,
+                    cancellationToken);
+
+            if (moduleProgress is null)
+            {
+                _context.ModuleProgress.Add(new ModuleProgress
+                {
+                    UserId = userId,
+                    ModuleId = moduleId,
+                    StartedAt = now,
+                    LastAccessedAt = now,
+                    IsCompleted = false
+                });
+            }
+            else
+            {
+                moduleProgress.LastAccessedAt = now;
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+
         public async Task<bool> CompleteLessonAsync(
             int userId, int lessonId, CancellationToken cancellationToken)
         {
@@ -114,27 +146,37 @@ namespace RestaurantTraining.Persistence.Repositories
                 progress.CompletedAt = now;
             }
 
-            // 2) Mark the module as started (so it counts as "pending", not "assigned").
+           
+            // 2) Update the module's last-accessed time, and mark it complete
+            //    if every active lesson in the module is now done.
             var moduleProgress = await _context.ModuleProgress
                 .FirstOrDefaultAsync(
                     mp => mp.UserId == userId && mp.ModuleId == lesson.ModuleId,
                     cancellationToken);
 
-            if (moduleProgress is null)
-            {
-                _context.ModuleProgress.Add(new ModuleProgress
-                {
-                    UserId = userId,
-                    ModuleId = lesson.ModuleId,
-                    StartedAt = now,
-                    LastAccessedAt = now,
-                    IsCompleted = false
-                });
-            }
-            else
+            if (moduleProgress is not null)
             {
                 moduleProgress.LastAccessedAt = now;
+
+                var totalActiveLessons = await _context.Lessons
+                    .CountAsync(l => l.ModuleId == lesson.ModuleId && l.IsActive, cancellationToken);
+
+                var completedLessons = await _context.LessonProgress
+                    .Join(_context.Lessons,
+                        p => p.LessonId, l => l.LessonId,
+                        (p, l) => new { p, l })
+                    .CountAsync(x => x.p.UserId == userId
+                        && x.l.ModuleId == lesson.ModuleId
+                        && x.l.IsActive
+                        && x.p.IsCompleted, cancellationToken);
+
+                if (!moduleProgress.IsCompleted && totalActiveLessons > 0 && completedLessons >= totalActiveLessons)
+                {
+                    moduleProgress.IsCompleted = true;
+                    moduleProgress.CompletedAt = now;
+                }
             }
+            
 
             await _context.SaveChangesAsync(cancellationToken);
             return true;

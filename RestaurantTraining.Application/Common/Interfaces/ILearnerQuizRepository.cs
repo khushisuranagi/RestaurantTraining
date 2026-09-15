@@ -39,6 +39,7 @@ namespace RestaurantTraining.Application.Common.Interfaces
         public string QuestionText { get; set; } = string.Empty;
         public int QuestionType { get; set; }
         public int Marks { get; set; }
+        public bool AllowMultipleAnswers { get; set; }
         public List<QuizOptionInfo> Options { get; set; } = [];
     }
 

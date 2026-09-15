@@ -11,5 +11,6 @@ namespace RestaurantTraining.Application.Features.Auth.Commands.Login
         public string Role { get; set; } = string.Empty;
 
         public string PhoneNumber { get; set; } = string.Empty;
+        public bool IsFirstLogin { get; set; }
     }
 }

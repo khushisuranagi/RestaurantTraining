@@ -26,6 +26,11 @@ public class LearnerDashboardService : ILearnerDashboardService
             : null;
     }
 
+    public async Task RecordModuleOpenedAsync(int moduleId)
+    {
+        await _http.PostAsync($"/api/learner/modules/{moduleId}/opened", null);
+    }
+
     public async Task<LearnerDashboardModel?> GetDashboardAsync()
     {
         var response = await _http.GetAsync("/api/learner/dashboard");
@@ -52,5 +57,24 @@ public class LearnerDashboardService : ILearnerDashboardService
         return await _http.GetFromJsonAsync<List<LearnerModuleOverviewModel>>(
             "/api/learner/my-modules/overview") ?? [];
     }
+
+    public async Task<byte[]?> DownloadCertificatePdfAsync(int certificateId)
+    {
+        var response = await _http.GetAsync($"/api/learner/certificates/{certificateId}/download");
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadAsByteArrayAsync()
+            : null;
+    }
+
+    public async Task<ArticlePreviewModel?> GetArticlePreviewAsync(string url)
+    {
+        var response = await _http.GetAsync(
+            $"/api/article-preview?url={Uri.EscapeDataString(url)}");
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<ArticlePreviewModel>()
+            : null;
+    }
+
 
 }

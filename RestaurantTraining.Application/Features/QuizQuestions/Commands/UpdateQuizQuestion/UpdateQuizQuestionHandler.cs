@@ -47,6 +47,7 @@ namespace RestaurantTraining.Application.Features.QuizQuestions.Commands.UpdateQ
             question.ImageUrl = request.ImageUrl;
             question.Explanation = request.Explanation;
             question.Marks = request.Marks;
+            question.AllowMultipleAnswers = request.AllowMultipleAnswers;
 
             await _quizQuestionRepository.UpdateQuizQuestionAsync(
                 question,

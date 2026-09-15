@@ -76,6 +76,12 @@ namespace RestaurantTraining.Application.Features.Auth.Commands.Login
 
             var role = user.Role.RoleName;
 
+            //to check if first time login
+            var isFirstLogin = user.LastLoginAt == null;
+
+            user.LastLoginAt = DateTime.UtcNow;
+            await _authRepository.UpdateUserAsync(user, cancellationToken);
+
             // Generate JWT
             var token = _jwtTokenService.GenerateToken(
                 user.UserId,
@@ -90,7 +96,8 @@ namespace RestaurantTraining.Application.Features.Auth.Commands.Login
                 Token = token,
                 FullName = user.FullName,
                 Role = role,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                IsFirstLogin = isFirstLogin
             };
         }
     }

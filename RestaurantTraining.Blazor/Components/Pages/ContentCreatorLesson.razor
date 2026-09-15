@@ -68,7 +68,7 @@
                 <div class="resource-card">
 
                     <div class="resource-type-label">
-                        @resource.ResourceType.ToString().ToUpper()
+                       @*  @resource.ResourceType.ToString().ToUpper() *@
                     </div>
 
 
@@ -91,21 +91,37 @@
                     }
 
 
-                    else if (resource.ResourceType == ResourceType.Pdf)
+                    else if (resource.ResourceType == ResourceType.Document)
                     {
                         @if (!string.IsNullOrWhiteSpace(resource.FileData))
                         {
-                            <div class="pdf-resource">
-                                <iframe src="@GetFileDataUrl(resource)"
-                                        class="resource-pdf"
-                                        title="@resource.FileName">
-                                </iframe>
-                            </div>
+                            @if (IsPdf(resource.ContentType))
+                            {
+                                <div class="pdf-resource">
+                                    <iframe src="@GetFileDataUrl(resource)" class="resource-pdf" title="@resource.FileName"></iframe>
+                                </div>
+                            }
+                            else if (IsDocx(resource.ContentType))
+                            {
+                                <div class="pdf-resource">
+                                    <div id="docx-preview-@resource.ResourceId" class="docx-preview">Loading document...</div>
+                                </div>
+                            }
+                            else if (IsPlainText(resource.ContentType))
+                            {
+                                <pre class="text-preview">@GetPlainTextContent(resource)</pre>
+                            }
+                            else
+                            {
+                                <a class="resource-link" href="@GetFileDataUrl(resource)" download="@resource.FileName">
+                                    📄 Download @resource.FileName
+                                </a>
+                            }
                         }
                         else
                         {
                             <div class="resource-fallback">
-                                PDF could not be loaded.
+                                File could not be loaded.
                             </div>
                         }
                     }
@@ -114,16 +130,35 @@
                     else if (resource.ResourceType == ResourceType.Article)
                     {
                         <div class="article-resource">
-
-                            <a href="@resource.ResourceUrl"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="resource-link">
-
-                                Open Article →
-
-                            </a>
-
+                            @if (!articlePreviews.TryGetValue(resource.ResourceId, out var preview) || preview is null)
+                            {
+                                <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                    Open Article →
+                                </a>
+                            }
+                            else if (preview.Success)
+                            {
+                                <a class="article-preview-card" href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer">
+                                    @if (!string.IsNullOrWhiteSpace(preview.ImageUrl))
+                                    {
+                                        <img class="article-preview-image" src="@preview.ImageUrl" alt="@preview.Title" />
+                                    }
+                                    <div class="article-preview-text">
+                                        <span class="article-preview-site">@(string.IsNullOrWhiteSpace(preview.SiteName) ? new Uri(resource.ResourceUrl).Host : preview.SiteName)</span>
+                                        <strong class="article-preview-title">@preview.Title</strong>
+                                        @if (!string.IsNullOrWhiteSpace(preview.Description))
+                                        {
+                                            <p class="article-preview-desc">@preview.Description</p>
+                                        }
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                    Open Article →
+                                </a>
+                            }
                         </div>
                     }
 
@@ -279,19 +314,19 @@
             }
 
 
-            @if (resourceType == ResourceType.Pdf)
+            @if (resourceType == ResourceType.Document)
             {
                 <div class="form-group">
 
-                    <label>PDF File</label>
+                    <label>Text File</label>
 
-                    <InputFile accept=".pdf,application/pdf"
+                    <InputFile accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
                                OnChange="HandleFileSelected" />
 
                     @if (editingResourceId != 0)
                     {
                         <p class="field-hint">
-                            Leave empty to keep the current PDF.
+                            Leave empty to keep the current text file.
                         </p>
                     }
 

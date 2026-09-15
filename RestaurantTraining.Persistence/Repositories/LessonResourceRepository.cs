@@ -57,6 +57,16 @@ namespace RestaurantTraining.Persistence.Repositories
                     cancellationToken);
         }
 
+        public async Task<List<LessonResource>> GetResourcesByLessonIdAsync(
+            int lessonId, 
+            CancellationToken cancellationToken)
+        {
+            return await _context.LessonResources
+                .Where(x => x.LessonId == lessonId && x.IsActive)
+                .OrderBy(x => x.SortOrder)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task UpdateLessonResourceAsync(
             LessonResource resource,
             CancellationToken cancellationToken)

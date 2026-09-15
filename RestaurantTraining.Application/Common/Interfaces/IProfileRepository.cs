@@ -5,6 +5,10 @@ namespace RestaurantTraining.Application.Common.Interfaces
     {
         // The user's details with the role name joined in. Null if not found.
         Task<ProfileInfo?> GetProfileAsync(int userId, CancellationToken cancellationToken);
+
+        // Update the user's editable personal info. Returns false if not found.
+        Task<bool> UpdateProfileAsync(
+            int userId, string fullName, string phoneNumber, CancellationToken cancellationToken);
     }
 
     public class ProfileInfo
@@ -16,5 +20,6 @@ namespace RestaurantTraining.Application.Common.Interfaces
         public string Role { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? LastLoginAt { get; set; }
     }
 }

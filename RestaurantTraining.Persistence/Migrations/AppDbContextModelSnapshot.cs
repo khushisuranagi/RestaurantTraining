@@ -222,6 +222,12 @@ namespace RestaurantTraining.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleId"));
 
+                    b.Property<string>("CoverImageContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverImageData")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -392,6 +398,9 @@ namespace RestaurantTraining.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionId"));
 
+                    b.Property<bool>("AllowMultipleAnswers")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Explanation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -533,6 +542,9 @@ namespace RestaurantTraining.Persistence.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()

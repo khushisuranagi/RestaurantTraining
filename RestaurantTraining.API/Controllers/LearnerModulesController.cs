@@ -2,8 +2,10 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantTraining.Application.Features.LearnerModules.Commands.CompleteLesson;
+using RestaurantTraining.Application.Features.LearnerModules.Commands.RecordModuleOpened;
 using RestaurantTraining.Application.Features.LearnerModules.Queries.GetAssignedModule;
 using RestaurantTraining.Application.Features.LearnerModules.Queries.GetAssignedModules;
+
 
 namespace RestaurantTraining.API.Controllers;
 
@@ -80,4 +82,24 @@ public class LearnerModulesController : ControllerBase
         var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         return int.TryParse(claim, out var id) ? id : null;
     }
+
+
+    // POST /api/learner/modules/5/opened
+    [HttpPost("{moduleId:int}/opened")]
+    public async Task<IActionResult> RecordModuleOpened(int moduleId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Forbid();
+
+        await _mediator.Send(new RecordModuleOpenedCommand
+        {
+            UserId = userId.Value,
+            ModuleId = moduleId
+        });
+
+        return Ok();
+    }
+
+
+
 }

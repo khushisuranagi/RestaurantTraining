@@ -32,7 +32,8 @@ namespace RestaurantTraining.Application.Features.Profile.Queries.GetProfile
                 PhoneNumber = profile.PhoneNumber,
                 Role = profile.Role,
                 IsActive = profile.IsActive,
-                CreatedAt = profile.CreatedAt
+                CreatedAt = profile.CreatedAt,
+                LastLoginAt = profile.LastLoginAt
             };
         }
     }

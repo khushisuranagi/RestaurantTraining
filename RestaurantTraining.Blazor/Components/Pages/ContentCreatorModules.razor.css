@@ -68,6 +68,48 @@
         background: #152d96;
     }
 
+.add-option-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #2b3a8f;
+    border: 1px dashed #2b3a8f;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-style 0.15s ease;
+}
+
+    .add-option-button:hover {
+        background: #eef0fb;
+        border-style: solid;
+    }
+
+.option-remove {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 6px 14px;
+    background: #ffffff;
+    color: #c0392b;
+    border: 1px solid #c0392b;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+    .option-remove:hover {
+        background: #fdecea;
+    }
+
+.resource-row-block {
+    margin-bottom: 12px;
+}
 
 /* =========================================================
    SEARCH + FILTER
@@ -313,7 +355,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 1100; /* above the sticky top bar (.top-row is z-index 1001) */
     display: flex;
     align-items: center;
     justify-content: center;

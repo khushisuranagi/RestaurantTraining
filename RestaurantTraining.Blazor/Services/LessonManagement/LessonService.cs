@@ -14,7 +14,7 @@ public class LessonManagementService : ILessonManagementService
 
 
     // GET LESSON
-    
+
     public async Task<LessonSummary?> GetLessonByIdAsync(
         int lessonId)
     {
@@ -27,9 +27,9 @@ public class LessonManagementService : ILessonManagementService
     }
 
 
-  
+
     // GET RESOURCES
- 
+
 
     public async Task<List<LessonResourceSummary>>
         GetResourcesAsync()
@@ -41,9 +41,9 @@ public class LessonManagementService : ILessonManagementService
     }
 
 
-    
+
     // CREATE / UPDATE RESOURCE
-  
+
 
     public async Task<SaveLessonResourceResult>
         SaveResourceAsync(
@@ -100,7 +100,7 @@ public class LessonManagementService : ILessonManagementService
 
 
     // DELETE RESOURCE
-   
+
 
     public async Task<bool> DeleteResourceAsync(
         int resourceId)
@@ -110,5 +110,15 @@ public class LessonManagementService : ILessonManagementService
                 $"/api/LessonResources/{resourceId}");
 
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<ArticlePreviewModel?> GetArticlePreviewAsync(string url)
+    {
+        var response = await _http.GetAsync(
+            $"/api/article-preview?url={Uri.EscapeDataString(url)}");
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<ArticlePreviewModel>()
+            : null;
     }
 }

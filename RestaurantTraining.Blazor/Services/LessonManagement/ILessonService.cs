@@ -14,4 +14,6 @@ public interface ILessonManagementService
 
     Task<bool> DeleteResourceAsync(
         int resourceId);
+
+    Task<ArticlePreviewModel?> GetArticlePreviewAsync(string url);
 }

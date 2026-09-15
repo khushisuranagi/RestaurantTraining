@@ -9,6 +9,7 @@ namespace RestaurantTraining.Blazor.Services
         public string FullName { get; set; } = string.Empty;
 
         public string Role { get; set; } = string.Empty;
+        public bool IsFirstLogin { get; set; }
 
         // True if logged in ( token).
         public bool IsLoggedIn => !string.IsNullOrEmpty(Token);

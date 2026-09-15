@@ -7,7 +7,11 @@
     <header class="dashboard-header">
         <div>
             <p class="eyebrow">CONTENT CREATOR</p>
-            <h1>Welcome back, @AuthState.FullName</h1>
+            <h1>
+                @(AuthState.IsFirstLogin
+                    ? $"Hi, {AuthState.FullName}! Let's get your training content started 👋"
+                    : $"Welcome back, {AuthState.FullName}")
+            </h1>
             <p>Here is an overview of your restaurant training content.</p>
         </div>
     </header>

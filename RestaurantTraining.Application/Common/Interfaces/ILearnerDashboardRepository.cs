@@ -49,9 +49,11 @@ namespace RestaurantTraining.Application.Common.Interfaces
         public int TotalLessons { get; set; }
         public int CompletedLessons { get; set; }
         public bool QuizPassed { get; set; }
+        public string? CoverImageData { get; set; }
+        public string? CoverImageContentType { get; set; }
     }
 
-    
+
     public class StartModuleResultInfo
     {
         public int ModuleId { get; set; }

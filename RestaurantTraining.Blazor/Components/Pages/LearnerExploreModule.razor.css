@@ -1,0 +1,70 @@
+.learning-module-page { max-width: 1000px; margin: 0 auto; padding: 2rem; color: #172033; }
+.back-button { margin-bottom: 2rem; border: 0; background: none; color: #1c39bb; cursor: pointer; font-weight: 700; }
+.eyebrow { color: #1c39bb; font-size: .8rem; font-weight: 700; letter-spacing: .12em; }
+h1 { color: #12355b; margin: .25rem 0 .5rem; }
+.module-description, .lesson-card > p { color: #64748b; }
+.lesson-card, .empty-state { margin-top: 1.5rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
+.lesson-card h2 { margin-top: 0; color: #12355b; font-size: 1.3rem; }
+.learning-resource { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e2e8f0; }
+.learning-resource a { color: #1c39bb; font-weight: 700; }
+.resource-video, .resource-pdf { width: 100%; border: 0; border-radius: 8px; }
+.resource-video { aspect-ratio: 16 / 9; }
+.resource-pdf { height: 600px; }
+.resource-image { display: block; max-width: 100%; border-radius: 8px; }
+.muted { color: #64748b; font-style: italic; }
+@media (max-width: 700px) { .learning-module-page { padding: 1.25rem; } .resource-pdf { height: 450px; } }
+
+/* ---- Lesson progress + navigation ---- */
+.lesson-progress { margin: 1rem 0 1.25rem; }
+.lesson-progress-top { display:flex; justify-content:space-between; color:#64748b; font-size:.85rem; margin-bottom:6px; }
+
+.lesson-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:1.5rem; }
+.lesson-prev, .lesson-next {
+    padding:.7rem 1.3rem; border-radius:10px; font-weight:700; cursor:pointer; transition:.2s ease;
+}
+.lesson-prev { border:1px solid #cbd5e1; background:#fff; color:#475569; }
+.lesson-prev:disabled { opacity:.5; cursor:not-allowed; }
+.lesson-next { border:none; background:#1c39bb; color:#fff; }
+.lesson-next:hover { background:#152d96; }
+
+.docx-preview {
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: #ffffff;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1a2340;
+}
+
+    .docx-preview p { margin: 0 0 12px 0; }
+
+    .docx-preview h1,
+    .docx-preview h2,
+    .docx-preview h3 { margin: 16px 0 8px 0; color: #1a2340; }
+
+    .docx-preview ul,
+    .docx-preview ol { margin: 0 0 12px 0; padding-left: 24px; }
+
+    .docx-preview table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+
+        .docx-preview table td,
+        .docx-preview table th { border: 1px solid #e5e7eb; padding: 8px; }
+
+    .docx-preview img { max-width: 100%; height: auto; }
+
+.text-preview {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f9fafb;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #1a2340;
+}

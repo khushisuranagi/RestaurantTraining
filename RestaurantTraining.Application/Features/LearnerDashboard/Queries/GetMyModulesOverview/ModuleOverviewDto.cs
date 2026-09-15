@@ -11,5 +11,7 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetMy
         public int CompletedLessons { get; set; }
         public int TotalLessons { get; set; }
         public int ProgressPercent { get; set; }
+        public string? CoverImageData { get; set; }
+        public string? CoverImageContentType { get; set; }
     }
 }

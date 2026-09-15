@@ -37,6 +37,13 @@ namespace RestaurantTraining.Application.Features.Modules.Commands.UpdateModule
             module.Description = request.Description;
             module.IsActive = request.IsActive;
 
+
+            if (!string.IsNullOrWhiteSpace(request.CoverImageData))
+            {
+                module.CoverImageData = request.CoverImageData;
+                module.CoverImageContentType = request.CoverImageContentType;
+            }
+
             await _moduleRepository.UpdateModuleAsync(module, cancellationToken);
 
             return new BaseResponse

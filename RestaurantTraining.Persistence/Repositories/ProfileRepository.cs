@@ -27,9 +27,26 @@ namespace RestaurantTraining.Persistence.Repositories
                     PhoneNumber = u.PhoneNumber,
                     Role = r.RoleName,
                     IsActive = u.IsActive,
-                    CreatedAt = u.CreatedAt
+                    CreatedAt = u.CreatedAt,
+                    LastLoginAt = u.LastLoginAt
                 }
             ).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<bool> UpdateProfileAsync(
+            int userId, string fullName, string phoneNumber, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+
+            if (user is null)
+                return false;
+
+            user.FullName = fullName;
+            user.PhoneNumber = phoneNumber;
+
+            await _context.SaveChangesAsync(cancellationToken);
+            return true;
         }
     }
 }

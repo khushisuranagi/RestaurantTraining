@@ -10,4 +10,7 @@ public interface ILearnerDashboardService
     Task<List<LearnerCertificateModel>> GetCertificatesAsync();
     Task<List<LearnerModuleOverviewModel>> GetModulesOverviewAsync();
     Task<LearnerDashboardModel?> GetDashboardAsync();
+    Task<ArticlePreviewModel?> GetArticlePreviewAsync(string url);
+    Task<byte[]?> DownloadCertificatePdfAsync(int certificateId);
+    Task RecordModuleOpenedAsync(int moduleId);
 }

@@ -37,6 +37,7 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Queries.GetQuiz
                         QuestionText = q.QuestionText,
                         QuestionType = q.QuestionType,
                         Marks = q.Marks,
+                        AllowMultipleAnswers = q.AllowMultipleAnswers,
                         Options = q.Options
                             .Select(o => new LearnerQuizOptionDto
                             {

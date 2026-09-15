@@ -35,7 +35,53 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetMy
                     TotalLessons = x.TotalLessons,
                     ProgressPercent = (int)Math.Round(
                         100.0 * (x.CompletedLessons + (x.QuizPassed ? 1 : 0))
-                        / (x.TotalLessons + 1))
+                        / (x.TotalLessons + 1)),
+                    CoverImageData = x.CoverImageData,
+                    CoverImageContentType = x.CoverImageContentType
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 })
                 .ToList();
         }

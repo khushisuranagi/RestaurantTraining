@@ -19,6 +19,7 @@ public class QuizQuestionSummary
     public string ImageUrl { get; set; } = string.Empty;
     public string Explanation { get; set; } = string.Empty;
     public int Marks { get; set; }
+    public bool AllowMultipleAnswers { get; set; }
 }
 
 public class QuizOptionSummary
@@ -39,6 +40,7 @@ public class SaveQuizQuestionRequest
     public string ImageUrl { get; set; } = string.Empty;
     public string Explanation { get; set; } = string.Empty;
     public int Marks { get; set; }
+    public bool AllowMultipleAnswers { get; set; }
 }
 
 // Used for BOTH create and update of an option (OptionId == 0 means create).

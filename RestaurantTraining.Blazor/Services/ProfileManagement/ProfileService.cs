@@ -15,4 +15,18 @@ public class ProfileService : IProfileService
             ? await response.Content.ReadFromJsonAsync<ProfileModel>()
             : null;//json
     }
+
+    public async Task<ProfileUpdateResult> UpdateProfileAsync(UpdateProfileRequest request)
+    {
+        var response = await _http.PutAsJsonAsync("/api/profile", request);
+
+        // The API returns a ProfileUpdateResult for both success and validation errors.
+        var result = await response.Content.ReadFromJsonAsync<ProfileUpdateResult>();
+
+        return result ?? new ProfileUpdateResult
+        {
+            Success = false,
+            Message = "Could not update your profile."
+        };
+    }
 }

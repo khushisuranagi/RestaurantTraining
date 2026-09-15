@@ -68,6 +68,7 @@ public partial class Login
             AuthState.Token = result.Token;
             AuthState.FullName = result.FullName;
             AuthState.Role = result.Role;
+            AuthState.IsFirstLogin = result.IsFirstLogin;
 
             Http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(

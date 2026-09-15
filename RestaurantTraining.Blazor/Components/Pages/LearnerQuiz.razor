@@ -33,7 +33,6 @@
         @foreach (var (q, index) in quiz.Questions.Select((q, i) => (q, i)))
         {
             <section class="quiz-question">
-
                 <h3>
                     @(index + 1). @q.QuestionText
                     <span class="q-marks">
@@ -48,7 +47,7 @@
                            placeholder="Type your answer"
                            @bind="textAnswers[q.QuestionId]" />
                 }
-                else if (q.QuestionType == (int)QuestionType.TrueFalse)
+                else if (q.QuestionType == (int)QuestionType.TrueFalse || (q.QuestionType == (int)QuestionType.MCQ && !q.AllowMultipleAnswers))
                 {
                     @foreach (var o in q.Options)
                     {
@@ -232,6 +231,8 @@
                 </div>
 
             </div>
+
+
         }
     }
 

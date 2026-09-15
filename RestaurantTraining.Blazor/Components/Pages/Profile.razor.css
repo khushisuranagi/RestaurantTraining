@@ -14,6 +14,12 @@
 }
 
 .profile-top { display:flex; align-items:center; gap:16px; padding-bottom:20px; border-bottom:1px solid #eef1f6; margin-bottom:20px; }
+.profile-top-text { flex:1; }
+.edit-btn {
+    padding:.5rem 1.1rem; border:1px solid #c7d2fe; border-radius:10px;
+    background:#eef2ff; color:#1c39bb; font-weight:700; font-size:.85rem; cursor:pointer; transition:.15s ease;
+}
+.edit-btn:hover { background:#e0e7ff; }
 .profile-avatar-lg {
     width:66px; height:66px; flex-shrink:0; display:grid; place-items:center;
     border-radius:50%; background:#1c39bb; color:#fff; font-size:1.4rem; font-weight:800;
@@ -30,6 +36,33 @@
 .status { display:inline-flex; padding:3px 10px; border-radius:999px; font-size:.78rem; font-weight:600; }
 .status.active { background:#dcfce7; color:#166534; }
 .status.inactive { background:#fef3c7; color:#92400e; }
+
+/* ---- Edit mode ---- */
+.edit-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px 24px; }
+@media (max-width:600px){ .edit-grid{ grid-template-columns:1fr; } }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group label { color:#94a3b8; font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.form-group input {
+    padding:10px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:.95rem;
+    box-sizing:border-box; width:100%;
+}
+.form-group input:focus { outline:none; border-color:#1c39bb; box-shadow:0 0 0 3px rgba(28,57,187,.1); }
+
+.edit-actions { display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:20px; border-top:1px solid #eef1f6; }
+.save-btn {
+    padding:.65rem 1.4rem; border:none; border-radius:10px; background:#1c39bb; color:#fff;
+    font-weight:700; font-size:.9rem; cursor:pointer;
+}
+.save-btn:hover:not(:disabled) { background:#162e99; }
+.save-btn:disabled, .cancel-btn:disabled { opacity:.6; cursor:not-allowed; }
+.cancel-btn {
+    padding:.65rem 1.4rem; border:1px solid #d1d5db; border-radius:10px; background:#fff; color:#475569;
+    font-weight:600; font-size:.9rem; cursor:pointer;
+}
+.cancel-btn:hover:not(:disabled) { background:#f8fafc; }
+
+.profile-message { padding:10px 14px; border-radius:8px; background:#fef2f2; color:#b91c1c; font-size:.85rem; margin:0 0 16px; }
+.profile-message.success { background:#f0fdf4; color:#15803d; }
 
 .profile-actions { margin-top:24px; padding-top:20px; border-top:1px solid #eef1f6; }
 .logout-btn {

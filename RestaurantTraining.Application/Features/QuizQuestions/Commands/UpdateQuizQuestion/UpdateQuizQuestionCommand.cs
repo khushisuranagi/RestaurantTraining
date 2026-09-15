@@ -18,5 +18,6 @@ namespace RestaurantTraining.Application.Features.QuizQuestions.Commands.UpdateQ
         public string Explanation { get; set; } = string.Empty;
 
         public int Marks { get; set; }
+        public bool AllowMultipleAnswers { get; set; }
     }
 }

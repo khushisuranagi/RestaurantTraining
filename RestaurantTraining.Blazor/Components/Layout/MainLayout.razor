@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthState AuthState
 @inject NavigationManager Navigation
+@inject HttpClient Http
 
 <div class="page">
     <div class="sidebar">
@@ -17,12 +18,29 @@
     <main>
         <div class="top-row">
             <div class="top-actions">
-                <div class="profile-summary" @onclick='() => Navigation.NavigateTo("/profile")' title="View profile">
-                    <span class="profile-avatar">@GetInitials()</span>
-                    <div>
-                        <strong>@AuthState.FullName</strong>
-                        <small>@AuthState.Role</small>
+                <div class="profile-menu-wrapper">
+                    <div class="profile-summary" @onclick="ToggleMenu" @onclick:stopPropagation="true">
+                        <span class="profile-avatar">@GetInitials()</span>
+                        <div>
+                            <strong>@AuthState.FullName</strong>
+                            <small>@AuthState.Role</small>
+                        </div>
                     </div>
+
+                    @if (showMenu)
+                    {
+                        <div class="profile-dropdown">
+                            <button class="dropdown-item" @onclick="GoToProfile">
+                                Profile
+                            </button>
+                            <button class="dropdown-item" @onclick="GoToSettings">
+                                Settings
+                            </button>
+                            <button class="dropdown-item logout-item" @onclick="ConfirmLogOut">
+                                Log out
+                            </button>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -33,7 +51,57 @@
     </main>
 </div>
 
+@if (showMenu)
+{
+    <div class="dropdown-overlay" @onclick="CloseMenu"></div>
+}
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
 @code {
+    private bool showMenu;
+
+    private void ToggleMenu()
+    {
+        showMenu = !showMenu;
+    }
+
+    private void CloseMenu()
+    {
+        showMenu = false;
+    }
+
+    private void GoToProfile()
+    {
+        showMenu = false;
+        Navigation.NavigateTo("/profile");
+    }
+
+    private void GoToSettings()
+    {
+        showMenu = false;
+        Navigation.NavigateTo("/settings");
+    }
+
+    private void ConfirmLogOut()
+    {
+        showMenu = false;
+
+        AuthState.Token = string.Empty;
+        AuthState.FullName = string.Empty;
+        AuthState.Role = string.Empty;
+        Http.DefaultRequestHeaders.Authorization = null;
+
+        // Client-side navigation (no forceLoad) so the layout swaps straight to
+        // the login screen — a full reload would leave the old authenticated
+        // page (with its sidebar) frozen on screen for a moment first.
+        Navigation.NavigateTo("/login");
+    }
+
     private string GetInitials()
     {
         if (string.IsNullOrWhiteSpace(AuthState.FullName)) return "CC";
@@ -44,9 +112,3 @@
             .Select(word => char.ToUpperInvariant(word[0])));
     }
 }
-
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>

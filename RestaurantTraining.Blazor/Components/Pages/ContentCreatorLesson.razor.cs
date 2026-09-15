@@ -77,6 +77,7 @@ public partial class ContentCreatorLesson
         if (lesson != null)
         {
             await LoadResources();
+            await LoadArticlePreviewsAsync();
         }
     }
 
@@ -113,9 +114,9 @@ public partial class ContentCreatorLesson
     }
 
 
-  
+
     // LOAD RESOURCES
-  
+
 
     private async Task LoadResources()
     {
@@ -131,6 +132,66 @@ public partial class ContentCreatorLesson
         }
     }
 
+
+    private Dictionary<int, ArticlePreviewModel?> articlePreviews = new();
+
+    private async Task LoadArticlePreviewsAsync()
+    {
+        var articleResources = resources
+            .Where(r => r.ResourceType == ResourceType.Article && !string.IsNullOrWhiteSpace(r.ResourceUrl))
+            .ToList();
+
+        foreach (var resource in articleResources)
+        {
+            if (articlePreviews.ContainsKey(resource.ResourceId)) continue;
+
+            var preview = await LessonManagementService.GetArticlePreviewAsync(resource.ResourceUrl);
+            articlePreviews[resource.ResourceId] = preview;
+        }
+    }
+
+
+    private static bool IsPdf(string? contentType) =>
+    contentType == "application/pdf";
+
+    private static bool IsDocx(string? contentType) =>
+        contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+    private static bool IsOldDoc(string? contentType) =>
+        contentType == "application/msword";
+
+    private static bool IsPlainText(string? contentType) =>
+        contentType == "text/plain";
+
+    private HashSet<int> docxRendered = new();
+
+    private static string GetPlainTextContent(LessonResourceSummary r)
+    {
+        if (string.IsNullOrWhiteSpace(r.FileData)) return string.Empty;
+        var bytes = Convert.FromBase64String(r.FileData);
+        return System.Text.Encoding.UTF8.GetString(bytes);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (lesson is null) return;
+
+        var docxResources = resources
+            .Where(r => r.LessonId == lesson.LessonId
+                && r.ResourceType == ResourceType.Document
+                && !string.IsNullOrWhiteSpace(r.FileData)
+                && IsDocx(r.ContentType))
+            .ToList();
+
+        foreach (var resource in docxResources)
+        {
+            if (docxRendered.Contains(resource.ResourceId)) continue;
+
+            docxRendered.Add(resource.ResourceId);
+            await JS.InvokeVoidAsync("renderDocxPreview",
+                $"docx-preview-{resource.ResourceId}", resource.FileData);
+        }
+    }
 
     // NAVIGATION
     private void BackToLessons()
@@ -299,10 +360,11 @@ public partial class ContentCreatorLesson
         selectedFile = e.File;
     }
 
+   
+   
 
-    
     // SAVE RESOURCE
-    
+
 
     private async Task SaveResource()
     {
@@ -320,12 +382,12 @@ public partial class ContentCreatorLesson
 
             var isFileType =
                 resourceType == ResourceType.Image ||
-                resourceType == ResourceType.Pdf;
+                resourceType == ResourceType.Document;
 
 
- 
+
             // CONVERT FILE TO BASE64
- 
+
 
             if (isFileType)
             {
@@ -365,9 +427,9 @@ public partial class ContentCreatorLesson
             }
 
 
- 
+
             // BUILD REQUEST
- 
+
 
             var request =
                 new SaveLessonResourceRequest
@@ -404,9 +466,9 @@ public partial class ContentCreatorLesson
                 };
 
 
- 
+
             // SAVE THROUGH SERVICE
- 
+
 
             var result =
                 await LessonManagementService
@@ -418,6 +480,7 @@ public partial class ContentCreatorLesson
                 CloseResourceModal();
 
                 await LoadResources();
+                await LoadArticlePreviewsAsync();
             }
             else
             {
@@ -436,5 +499,8 @@ public partial class ContentCreatorLesson
         {
             isSaving = false;
         }
+
+
+
     }
 }

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantTraining.Application.Features.LearnerCertificates.Queries.GetCertificatePdf;
 using RestaurantTraining.Application.Features.LearnerCertificates.Queries.GetMyCertificates;
 
 namespace RestaurantTraining.API.Controllers;
@@ -33,4 +34,23 @@ public class LearnerCertificatesController : ControllerBase
         var result = await _mediator.Send(new GetMyCertificatesQuery { UserId = userId.Value });
         return Ok(result);
     }
+
+    //get certificate pdf
+    [HttpGet("{certificateId}/download")]
+    public async Task<IActionResult> DownloadCertificate(int certificateId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Forbid();
+
+        var result = await _mediator.Send(new GetCertificatePdfQuery
+        {
+            CertificateId = certificateId,
+            UserId = userId.Value
+        });
+
+        if (result is null) return NotFound();
+
+        return File(result.FileBytes, "application/pdf", result.FileName);
+    }
+
 }

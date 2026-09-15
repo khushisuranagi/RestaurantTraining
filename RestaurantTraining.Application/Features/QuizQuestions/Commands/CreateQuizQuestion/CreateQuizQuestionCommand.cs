@@ -16,5 +16,7 @@ namespace RestaurantTraining.Application.Features.QuizQuestions.Commands.CreateQ
         public string Explanation { get; set; } = string.Empty;
 
         public int Marks { get; set; }
+
+        public bool AllowMultipleAnswers { get; set; }
     }
 }

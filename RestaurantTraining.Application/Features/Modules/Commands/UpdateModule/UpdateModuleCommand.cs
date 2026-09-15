@@ -13,5 +13,7 @@ namespace RestaurantTraining.Application.Features.Modules.Commands.UpdateModule
         public string Description { get; set; } = string.Empty;
 
         public bool IsActive { get; set; }
+        public string? CoverImageData { get; set; }
+        public string? CoverImageContentType { get; set; }
     }
 }

@@ -21,6 +21,10 @@ namespace RestaurantTraining.Application.Common.Interfaces
             int resourceId,
             CancellationToken cancellationToken);
 
+        Task<List<LessonResource>> GetResourcesByLessonIdAsync(
+            int lessonId,
+            CancellationToken cancellationToken);
+
         Task UpdateLessonResourceAsync(
             LessonResource resource,
             CancellationToken cancellationToken);

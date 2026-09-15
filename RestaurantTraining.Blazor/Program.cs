@@ -2,11 +2,12 @@ using RestaurantTraining.Blazor.Components;
 using RestaurantTraining.Blazor.Services;
 using RestaurantTraining.Blazor.Services.CertificateManagement;
 using RestaurantTraining.Blazor.Services.DashboardManagement;
+using RestaurantTraining.Blazor.Services.LearnerDashboardManagement;
+using RestaurantTraining.Blazor.Services.LearnerQuizManagement;
 using RestaurantTraining.Blazor.Services.LessonManagement;
 using RestaurantTraining.Blazor.Services.ModuleManagement;
 using RestaurantTraining.Blazor.Services.QuizManagement;
-using RestaurantTraining.Blazor.Services.LearnerQuizManagement;
-using RestaurantTraining.Blazor.Services.LearnerDashboardManagement;
+using RestaurantTraining.Blazor.Services.SettingsManagement;
 
 var builder = WebApplication.CreateBuilder(args);  //instance
 
@@ -35,6 +36,9 @@ builder.Services.AddScoped<RestaurantTraining.Blazor.Services.PeopleManagement.I
     RestaurantTraining.Blazor.Services.PeopleManagement.PeopleService>();
 builder.Services.AddScoped<RestaurantTraining.Blazor.Services.ProfileManagement.IProfileService,
     RestaurantTraining.Blazor.Services.ProfileManagement.ProfileService>();
+builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<RestaurantTraining.Blazor.Services.LearnerExplore.IExploreService,
+    RestaurantTraining.Blazor.Services.LearnerExplore.ExploreService>();
 
 
 var app = builder.Build();   //web app instance

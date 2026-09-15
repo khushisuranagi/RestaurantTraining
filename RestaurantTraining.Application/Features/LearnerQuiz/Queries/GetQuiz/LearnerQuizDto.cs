@@ -14,6 +14,7 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Queries.GetQuiz
         public string QuestionText { get; set; } = string.Empty;
         public int QuestionType { get; set; }
         public int Marks { get; set; }
+        public bool AllowMultipleAnswers { get; set; }
         public List<LearnerQuizOptionDto> Options { get; set; } = [];
     }
 

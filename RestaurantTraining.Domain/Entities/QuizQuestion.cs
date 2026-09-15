@@ -15,5 +15,10 @@ namespace RestaurantTraining.Domain.Entities
         public string Explanation { get; set; } = string.Empty;
 
         public int Marks { get; set; }
+
+        // NEW: only meaningful when QuestionType == MCQ.
+        // true = learner can pick more than one option (checkboxes).
+        // false = learner must pick exactly one (radio buttons).
+        public bool AllowMultipleAnswers { get; set; }
     }
 }

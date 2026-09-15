@@ -34,7 +34,9 @@ namespace RestaurantTraining.Application.Features.Modules.Commands.CreateModule
                 ModuleName = request.ModuleName,
                 Description = request.Description,
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CoverImageData = request.CoverImageData,               // NEW
+                CoverImageContentType = request.CoverImageContentType
             };
 
             // Save it and get the new id back.

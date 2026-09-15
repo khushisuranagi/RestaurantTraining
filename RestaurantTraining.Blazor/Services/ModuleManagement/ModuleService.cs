@@ -25,12 +25,16 @@ public class ModuleService : IModuleService
 
     public async Task<CreateModuleResult> CreateModuleAsync(
         string moduleName,
-        string description)
+        string description,
+        string? coverImageData = null,
+    string? coverImageContentType = null)
     {
         var command = new
         {
             ModuleName = moduleName,
-            Description = description
+            Description = description,
+            CoverImageData = coverImageData,
+            CoverImageContentType = coverImageContentType
         };
 
         var response = await _http.PostAsJsonAsync(
@@ -59,14 +63,18 @@ public class ModuleService : IModuleService
         int moduleId,
         string moduleName,
         string description,
-        bool isActive)
+        bool isActive,
+        string? coverImageData = null,
+        string? coverImageContentType = null)
     {
         var command = new
         {
             ModuleId = moduleId,
             ModuleName = moduleName,
             Description = description,
-            IsActive = isActive
+            IsActive = isActive,
+            CoverImageData = coverImageData,
+            CoverImageContentType = coverImageContentType
         };
 
         var response = await _http.PutAsJsonAsync(
@@ -410,6 +418,9 @@ public class ModuleSummary
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public string? CoverImageData { get; set; }
+    public string? CoverImageContentType { get; set; }
 }
 
 
@@ -435,7 +446,7 @@ public class LessonResourceSummary
 
     public int LessonId { get; set; }
 
-    public string ResourceType { get; set; } = string.Empty;
+    public RestaurantTraining.Domain.Enums.ResourceType ResourceType { get; set; }
 
     public string ResourceUrl { get; set; } = string.Empty;
 

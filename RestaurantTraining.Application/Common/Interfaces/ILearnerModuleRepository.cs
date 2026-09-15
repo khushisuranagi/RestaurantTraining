@@ -1,18 +1,22 @@
 namespace RestaurantTraining.Application.Common.Interfaces
 {
-   
+
     public interface ILearnerModuleRepository
     {
         Task<List<AssignedModuleInfo>> GetAssignedModulesAsync(
             string roleName, CancellationToken cancellationToken);
 
-       
+
         Task<ModuleContentInfo?> GetAssignedModuleAsync(
             string roleName, int userId, int moduleId, CancellationToken cancellationToken);
 
-      
+
         Task<bool> CompleteLessonAsync(
             int userId, int lessonId, CancellationToken cancellationToken);
+
+        Task RecordModuleOpenedAsync(
+    int userId, int moduleId, CancellationToken cancellationToken);
+
     }
 
     public class AssignedModuleInfo

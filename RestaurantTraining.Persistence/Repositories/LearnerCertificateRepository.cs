@@ -40,6 +40,25 @@ namespace RestaurantTraining.Persistence.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+
+        public async Task<LearnerCertificateInfo?> GetCertificateAsync(
+    int certificateId, int userId, CancellationToken cancellationToken)
+        {
+            return await (
+                from c in _context.Certificates
+                join m in _context.Modules on c.ModuleId equals m.ModuleId
+                where c.CertificateId == certificateId && c.UserId == userId
+                select new LearnerCertificateInfo
+                {
+                    CertificateId = c.CertificateId,
+                    CertificateNumber = c.CertificateNumber,
+                    ModuleId = c.ModuleId,
+                    ModuleName = m.ModuleName,
+                    IssuedDate = c.IssuedDate
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         public async Task<List<LearnerAttemptInfo>> GetPassedAttemptsAsync(
             int userId, List<int> moduleIds, CancellationToken cancellationToken)
         {

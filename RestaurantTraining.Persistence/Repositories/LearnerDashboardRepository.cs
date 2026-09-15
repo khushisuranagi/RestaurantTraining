@@ -28,7 +28,9 @@ namespace RestaurantTraining.Persistence.Repositories
                     module.ModuleId,
                     module.ModuleName,
                     module.Description,
-                    roleModule.AssignedAt
+                    roleModule.AssignedAt,
+                    module.CoverImageData,           // NEW
+                    module.CoverImageContentType
                 }
             ).ToListAsync(cancellationToken);
 
@@ -108,7 +110,9 @@ namespace RestaurantTraining.Persistence.Repositories
                     CompletedAt = moduleProgress?.CompletedAt,
                     TotalLessons = totalLessons,
                     CompletedLessons = completedLessons,
-                    QuizPassed = quizPassed
+                    QuizPassed = quizPassed,
+                    CoverImageData = module.CoverImageData,               // NEW
+                    CoverImageContentType = module.CoverImageContentType
                 });
             }
 

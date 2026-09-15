@@ -23,6 +23,27 @@
     border:1px solid rgba(15,23,42,.10); border-radius:8px; pointer-events:none;
 }
 
+.cert-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px auto 0;
+    padding: 10px 20px;
+    background: #2b3a8f;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+    .cert-download-btn:hover {
+        background: #1f2c6e;
+    }
+
 .cert-brand { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:22px; }
 .cert-logo-mark { width:44px; height:44px; color:var(--accent); flex-shrink:0; }
 .cert-brand-text { display:flex; flex-direction:column; align-items:flex-start; line-height:1.1; }

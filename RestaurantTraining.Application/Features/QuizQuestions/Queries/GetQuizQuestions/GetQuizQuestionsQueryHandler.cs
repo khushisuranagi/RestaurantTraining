@@ -30,7 +30,8 @@ namespace RestaurantTraining.Application.Features.QuizQuestions.Queries.GetQuizQ
                 QuestionType = x.QuestionType,
                 ImageUrl = x.ImageUrl,
                 Explanation = x.Explanation,
-                Marks = x.Marks
+                Marks = x.Marks,
+                AllowMultipleAnswers = x.AllowMultipleAnswers
             }).ToList();
         }
     }

@@ -35,7 +35,8 @@ namespace RestaurantTraining.Application.Features.QuizQuestions.Commands.CreateQ
                 QuestionType = request.QuestionType,
                 ImageUrl = request.ImageUrl,
                 Explanation = request.Explanation,
-                Marks = request.Marks
+                Marks = request.Marks,
+                AllowMultipleAnswers = request.AllowMultipleAnswers
             };
 
             var newQuestionId =

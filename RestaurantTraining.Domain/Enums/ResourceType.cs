@@ -5,6 +5,6 @@
         Video = 0,
         Image = 1,
         Article = 2,
-        Pdf = 3
+        Document = 3
     }
 }

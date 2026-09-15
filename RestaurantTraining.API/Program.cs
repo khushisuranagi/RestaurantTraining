@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using RestaurantTraining.Infrastructure;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using RestaurantTraining.Application.Common.Authentication;
+using RestaurantTraining.Infrastructure;
 using RestaurantTraining.Persistence;
 using RestaurantTraining.Persistence.Seed;
-using Microsoft.OpenApi;
 using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 builder.Services.AddControllers();
+
 
 // Register MediatR so IMediator works
 //finds all our Commands, Queries and Handlers
