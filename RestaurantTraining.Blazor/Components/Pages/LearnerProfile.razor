@@ -1,0 +1,110 @@
+﻿@page "/people/{UserId:int}"
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.PeopleManagement
+@inject IPeopleService PeopleService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Learner Profile</PageTitle>
+
+<div class="people-page">
+
+    <button class="back-link" @onclick='() => Navigation.NavigateTo("/people")'>
+        ← Back to People
+    </button>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">Loading profile...</div>
+    }
+    else if (profile is null)
+    {
+        <div class="empty-state">
+            <h3>User not found</h3>
+            <p>This account may have been removed.</p>
+        </div>
+    }
+    else
+    {
+        <div class="people-header">
+            <div class="profile-title-row">
+                <span class="user-avatar large">@Initials(profile.FullName)</span>
+                <div>
+                    <p class="eyebrow">LEARNER PROFILE</p>
+                    <h1>@profile.FullName</h1>
+                </div>
+            </div>
+            <div class="people-summary">
+                <span class="status-badge @(profile.IsActive ? "status-active" : "status-inactive")">
+                    @(profile.IsActive ? "Active" : "Inactive")
+                </span>
+            </div>
+        </div>
+
+        <div class="role-card">
+            <div class="role-head">
+                <h2>General Info</h2>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Full name</span>
+                    <p>@profile.FullName</p>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Email</span>
+                    <p>@profile.Email</p>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Phone number</span>
+                    <p>@(string.IsNullOrWhiteSpace(profile.PhoneNumber) ? "—" : profile.PhoneNumber)</p>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Role</span>
+                    <p><span class="module-chip">@profile.RoleName</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="role-card">
+            <div class="role-head">
+                <h2>Account Status</h2>
+                <span class="role-counts">Controls login access and reporting</span>
+            </div>
+
+            <p class="status-note">
+                Toggling this off blocks @profile.FullName from logging in and excludes them
+                from learner counts and reports. Toggling it back on restores access immediately.
+            </p>
+
+            <div class="status-toggle-row">
+                <span class="status-badge @(profile.IsActive ? "status-active" : "status-inactive")">
+                    @(profile.IsActive ? "Active" : "Inactive")
+                </span>
+
+                <label class="switch">
+                    <input type="checkbox"
+                           checked="@profile.IsActive"
+                           disabled="@isSavingStatus"
+                           @onchange="ToggleStatus" />
+                    <span class="slider"></span>
+                </label>
+
+                @if (isSavingStatus)
+                {
+                    <span class="saving-hint">Saving...</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <p class="status-message @(isStatusSuccess ? "success" : "error")">@statusMessage</p>
+            }
+        </div>
+    }
+
+</div>

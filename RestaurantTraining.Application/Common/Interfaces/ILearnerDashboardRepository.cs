@@ -25,6 +25,10 @@ namespace RestaurantTraining.Application.Common.Interfaces
         Task<int> GetPassedScenarioCountAsync(
             int userId, CancellationToken cancellationToken);
 
+        // Total points earned from the lesson-resource MCQs.
+        Task<int> GetResourceQuestionPointsAsync(
+            int userId, CancellationToken cancellationToken);
+
        
         Task<bool> IsModuleAssignedToLearnerAsync(
             int userId, int moduleId, CancellationToken cancellationToken);

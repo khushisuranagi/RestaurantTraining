@@ -12,7 +12,7 @@
 
     <div class="people-header">
         <div>
-            <p class="eyebrow">CONTENT MANAGEMENT</p>
+            <p class="eyebrow">PEOPLE MANAGEMENT</p>
             <h1>People</h1>
             <p>Users grouped by role, and the modules assigned to each role.</p>
         </div>
@@ -73,7 +73,7 @@
                         {
                             @foreach (var u in users)
                             {
-                                <div class="user-row">
+                                <div class="user-row" @onclick='() => Navigation.NavigateTo($"/people/{u.UserId}")'>
                                     <span class="user-avatar">@Initials(u.FullName)</span>
                                     <div class="user-main">
                                         <strong>@u.FullName</strong>
@@ -145,4 +145,6 @@
             .Take(2)
             .Select(w => char.ToUpperInvariant(w[0])));
     }
+
+    
 }

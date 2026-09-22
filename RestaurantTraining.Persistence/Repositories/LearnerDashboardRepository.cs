@@ -161,6 +161,14 @@ namespace RestaurantTraining.Persistence.Repositories
                 .CountAsync(cancellationToken);
         }
 
+        public async Task<int> GetResourceQuestionPointsAsync(
+            int userId, CancellationToken cancellationToken)
+        {
+            return await _context.ResourceQuestionAttempts
+                .Where(a => a.UserId == userId)
+                .SumAsync(a => (int?)a.PointsAwarded, cancellationToken) ?? 0;
+        }
+
         public async Task<bool> IsModuleAssignedToLearnerAsync(
             int userId, int moduleId, CancellationToken cancellationToken)
         {

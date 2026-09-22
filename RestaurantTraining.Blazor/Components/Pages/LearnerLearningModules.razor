@@ -9,7 +9,7 @@
 <PageTitle>Learning Module</PageTitle>
 
 <div class="learning-module-page">
-    <button class="back-button" @onclick='() => Navigation.NavigateTo("/learner-dashboard")'>← Back to dashboard</button>
+    <button class="back-button" @onclick='() => Navigation.NavigateTo("/learning-modules")'>← Back to Learning</button>
 
     @if (isLoading)
     {
@@ -23,6 +23,10 @@
     {
         <p class="eyebrow">TRAINING MODULE</p>
         <h1>@module.ModuleName</h1>
+        @if (totalPoints > 0)
+        {
+            <p class="points-badge">⭐ @totalPoints points</p>
+        }
         <p class="module-description">@module.Description</p>
 
         @if (module.Lessons.Count == 0)
@@ -120,27 +124,100 @@
                                     <a href="@resource.ResourceUrl" target="_blank" rel="noopener noreferrer">Open article →</a>
                                 }
                             }
+                            @* ---- Optional AI summary ---- *@
+                            <div class="resource-summary">
+                                @if (summaries.TryGetValue(resource.ResourceId, out var summ) && summ is not null)
+                                {
+                                    <div class="summary-box">
+                                        <p class="summary-title">✨ AI summary</p>
+                                        <p class="summary-text">@summ</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button class="summary-btn"
+                                            disabled="@summarizing.Contains(resource.ResourceId)"
+                                            @onclick="() => LoadSummary(resource.ResourceId)">
+                                        @(summarizing.Contains(resource.ResourceId) ? "Summarising..." : "Summarise with AI")
+                                    </button>
+                                    @if (summaryErrors.Contains(resource.ResourceId))
+                                    {
+                                        <p class="summary-error">Couldn't generate a summary. Please try again.</p>
+                                    }
+                                }
+                            </div>
                         </div>
                     }
                 }
             </section>
+
+            @* ---- AI question(s) for this lesson's resource(s) ---- *@
+            @foreach (var res in lesson.Resources)
+            {
+                @if (questionsLoaded.Contains(res.ResourceId) && resourceQuestions[res.ResourceId] is { } q)
+                {
+                    <section class="mcq-card">
+                        <p class="mcq-eyebrow">QUICK CHECK</p>
+                        <p class="mcq-question">@q.QuestionText</p>
+
+                        @if (answeredCorrectly.Contains(res.ResourceId))
+                        {
+                            <p class="mcq-correct">✓ Correct — you can continue.</p>
+                            @if (answerResults.TryGetValue(res.ResourceId, out var okRes) && okRes is not null && !string.IsNullOrWhiteSpace(okRes.Explanation))
+                            {
+                                <p class="mcq-explanation">@okRes.Explanation</p>
+                            }
+                        }
+                        else
+                        {
+                            <div class="mcq-options">
+                                @foreach (var opt in q.Options)
+                                {
+                                    <label class="mcq-option">
+                                        <input type="radio" name="mcq-@res.ResourceId"
+                                               checked="@(selectedOptions.GetValueOrDefault(res.ResourceId) == opt.OptionId)"
+                                               @onchange="() => selectedOptions[res.ResourceId] = opt.OptionId" />
+                                        <span>@opt.OptionText</span>
+                                    </label>
+                                }
+                            </div>
+
+                            @if (answerResults.TryGetValue(res.ResourceId, out var wrongRes) && wrongRes is not null && !wrongRes.IsCorrect)
+                            {
+                                <p class="mcq-wrong">✗ Not quite — try again.</p>
+                            }
+
+                            <button class="mcq-submit"
+                                    disabled="@(submitting.Contains(res.ResourceId) || selectedOptions.GetValueOrDefault(res.ResourceId) is null)"
+                                    @onclick="() => SubmitResourceAnswer(res.ResourceId)">
+                                @(submitting.Contains(res.ResourceId) ? "Checking..." : "Submit answer")
+                            </button>
+                        }
+                    </section>
+                }
+            }
 
             <div class="lesson-nav">
                 <button class="lesson-prev" disabled="@(currentIndex == 0)" @onclick="Previous">← Previous</button>
 
                 @if (currentIndex < total - 1)
                 {
-                    <button class="lesson-next" disabled="@isSaving" @onclick="Next">
+                    <button class="lesson-next" disabled="@(isSaving || !CanProceed())" @onclick="Next">
                         @(isSaving ? "Saving..." : "Next →")
                     </button>
                 }
                 else
                 {
-                    <button class="lesson-quiz" disabled="@isSaving" @onclick="TakeQuiz">
+                    <button class="lesson-quiz" disabled="@(isSaving || !CanProceed())" @onclick="TakeQuiz">
                         @(isSaving ? "Saving..." : "Take Quiz →")
                     </button>
                 }
             </div>
+
+            @if (!CanProceed())
+            {
+                <p class="gate-hint">Answer the question above correctly to continue.</p>
+            }
         }
     }
 </div>
@@ -151,6 +228,93 @@
     private bool isLoading = true;
     private bool isSaving;
     private int currentIndex;
+
+    // ---- AI question (MCQ) state, keyed by resourceId ----
+    private HashSet<int> questionsLoaded = new();
+    private Dictionary<int, ResourceQuestionModel?> resourceQuestions = new();
+    private Dictionary<int, int?> selectedOptions = new();
+    private Dictionary<int, ResourceAnswerResultModel?> answerResults = new();
+    private HashSet<int> answeredCorrectly = new();
+    private HashSet<int> submitting = new();
+    private int totalPoints;
+
+    // Load the MCQ for each resource in the current lesson (once each).
+    private async Task LoadQuestionsForCurrentLesson()
+    {
+        if (module is null || module.Lessons.Count == 0) return;
+
+        var lesson = module.Lessons[currentIndex];
+        foreach (var r in lesson.Resources)
+        {
+            if (questionsLoaded.Contains(r.ResourceId)) continue;
+
+            var q = await LearnerDashboardService.GetResourceQuestionAsync(r.ResourceId);
+            resourceQuestions[r.ResourceId] = q;
+            questionsLoaded.Add(r.ResourceId);
+
+            if (q is not null && q.AlreadyAnsweredCorrectly)
+                answeredCorrectly.Add(r.ResourceId);
+        }
+        StateHasChanged();
+    }
+
+    // Can the learner move on? Only once every loaded question is answered right.
+    private bool CanProceed()
+    {
+        if (module is null || module.Lessons.Count == 0) return true;
+
+        var lesson = module.Lessons[currentIndex];
+        foreach (var r in lesson.Resources)
+        {
+            if (!questionsLoaded.Contains(r.ResourceId)) return false;   // still loading
+            var q = resourceQuestions[r.ResourceId];
+            if (q is not null && !answeredCorrectly.Contains(r.ResourceId)) return false;
+        }
+        return true;
+    }
+
+    private async Task SubmitResourceAnswer(int resourceId)
+    {
+        if (!selectedOptions.TryGetValue(resourceId, out var optId) || optId is null) return;
+
+        submitting.Add(resourceId);
+        try
+        {
+            var result = await LearnerDashboardService.SubmitResourceAnswerAsync(resourceId, optId.Value);
+            answerResults[resourceId] = result;
+
+            if (result is not null)
+            {
+                totalPoints = result.TotalPoints;
+                if (result.IsCorrect) answeredCorrectly.Add(resourceId);
+            }
+        }
+        finally { submitting.Remove(resourceId); }
+    }
+
+    // ---- AI summary state ----
+    private Dictionary<int, string?> summaries = new();
+    private HashSet<int> summarizing = new();
+    private HashSet<int> summaryErrors = new();
+
+    private async Task LoadSummary(int resourceId)
+    {
+        summarizing.Add(resourceId);
+        summaryErrors.Remove(resourceId);
+        try
+        {
+            var text = await LearnerDashboardService.GetResourceSummaryAsync(resourceId);
+            if (string.IsNullOrWhiteSpace(text))
+                summaryErrors.Add(resourceId);
+            else
+                summaries[resourceId] = text;
+        }
+        catch
+        {
+            summaryErrors.Add(resourceId);
+        }
+        finally { summarizing.Remove(resourceId); }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -165,6 +329,7 @@
                 var firstIncomplete = module.Lessons.FindIndex(l => !l.IsCompleted);
                 currentIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
                 await LoadArticlePreviewsForCurrentLesson();
+                await LoadQuestionsForCurrentLesson();
             }
         }
         finally { isLoading = false; }
@@ -209,10 +374,11 @@
         finally { isSaving = false; }
     }
 
-    private void Previous()
+    private async Task Previous()
     {
         if (currentIndex > 0) currentIndex--;
-        _ = LoadArticlePreviewsForCurrentLesson();
+        await LoadArticlePreviewsForCurrentLesson();
+        await LoadQuestionsForCurrentLesson();
     }
 
     private async Task Next()
@@ -220,6 +386,7 @@
         await MarkCurrentComplete();
         if (module is not null && currentIndex < module.Lessons.Count - 1) currentIndex++;
         await LoadArticlePreviewsForCurrentLesson();
+        await LoadQuestionsForCurrentLesson();
     }
 
     private async Task TakeQuiz()

@@ -13,6 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
+
+// Bind the Gemini AI settings (ApiKey + Model) from the "Gemini" config section.
+builder.Services.Configure<RestaurantTraining.Infrastructure.Ai.GeminiSettings>(
+    builder.Configuration.GetSection("Gemini"));
 var jwtSettings = builder.Configuration
     .GetSection("JwtSettings")
     .Get<JwtSettings>();

@@ -47,6 +47,15 @@
 /* ---- Passed: certificate card ---- */
 .pass-heading { text-align:center; color:#166534; margin:.5rem 0 1rem; }
 
+/* ---- Passed: next step (practice scenario) ---- */
+.next-step-card {
+    max-width:2000px; margin:0 auto; padding:1.5rem 1.75rem; text-align:center;
+    background:#f7f9ff; border:1px solid #dbe3f4; border-radius:14px;
+}
+.next-step-eyebrow { margin:0 0 .35rem; color:#1c39bb; font-size:1.5rem; font-weight:700; letter-spacing:.1em; }
+.next-step-card h3 { margin:0 0 .5rem; color:#12355b; }
+.next-step-card p { margin:0; color:#475569; line-height:1.55; }
+
 .cert-card {
     --accent:#1c39bb;
     max-width: 720px; margin: 0 auto;

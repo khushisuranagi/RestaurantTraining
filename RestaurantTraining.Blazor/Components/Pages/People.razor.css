@@ -47,3 +47,11 @@
 .user-main { display:flex; flex-direction:column; min-width:0; }
 .user-main strong { color:#12355b; font-size:.9rem; }
 .user-main small { color:#64748b; font-size:.78rem; overflow:hidden; text-overflow:ellipsis; }
+
+.user-row {
+    cursor: pointer;
+}
+
+    .user-row:hover {
+        background-color: #f9fafb;
+    }

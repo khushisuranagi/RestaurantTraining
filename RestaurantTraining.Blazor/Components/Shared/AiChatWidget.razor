@@ -1,0 +1,98 @@
+@using Microsoft.AspNetCore.Components.Web
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services.AssistantManagement
+@inject IAssistantService AssistantService
+
+<div class="ai-widget">
+
+    @if (isOpen)
+    {
+        <div class="ai-panel">
+            <div class="ai-header">
+                <span class="ai-title">Ask Assistant</span>
+                <button class="ai-close" @onclick="Toggle" aria-label="Close">×</button>
+            </div>
+
+            <div class="ai-messages">
+                @if (messages.Count == 0)
+                {
+                    <div class="ai-msg bot">
+                        <div class="ai-bubble">Hi! I'm your training assistant. Ask me anything about the app or your training.</div>
+                    </div>
+                }
+                @foreach (var m in messages)
+                {
+                    <div class="ai-msg @(m.FromUser ? "me" : "bot")">
+                        <div class="ai-bubble">@m.Text</div>
+                    </div>
+                }
+                @if (sending)
+                {
+                    <div class="ai-msg bot"><div class="ai-bubble typing">…</div></div>
+                }
+            </div>
+
+            <div class="ai-input">
+                <input type="text"
+                       placeholder="Type your question..."
+                       @bind="draft"
+                       @bind:event="oninput"
+                       @onkeydown="OnKeyDown" />
+                <button class="ai-send" disabled="@(sending || string.IsNullOrWhiteSpace(draft))" @onclick="Send">➤</button>
+            </div>
+        </div>
+    }
+
+    <button class="ai-fab" @onclick="Toggle" aria-label="Chat assistant">
+        @(isOpen ? "×" : "💬")
+    </button>
+
+</div>
+
+@code {
+    private bool isOpen;
+    private bool sending;
+    private string draft = string.Empty;
+    private List<AssistantChatMessage> messages = [];
+
+    private void Toggle() => isOpen = !isOpen;
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !sending && !string.IsNullOrWhiteSpace(draft))
+            await Send();
+    }
+
+    private async Task Send()
+    {
+        if (string.IsNullOrWhiteSpace(draft)) return;
+
+        var text = draft.Trim();
+        draft = string.Empty;
+        messages.Add(new AssistantChatMessage { FromUser = true, Text = text });
+
+        sending = true;
+        StateHasChanged();
+
+        try
+        {
+            var reply = await AssistantService.ChatAsync(messages);
+            messages.Add(new AssistantChatMessage
+            {
+                FromUser = false,
+                Text = string.IsNullOrWhiteSpace(reply)
+                    ? "Sorry, I couldn't respond. Please try again."
+                    : reply
+            });
+        }
+        catch
+        {
+            messages.Add(new AssistantChatMessage
+            {
+                FromUser = false,
+                Text = "Something went wrong. Please try again."
+            });
+        }
+        finally { sending = false; }
+    }
+}

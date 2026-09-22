@@ -9,4 +9,6 @@ public interface ISettingsService
     Task<UpdateEmailResult> UpdateEmailAsync(UpdateEmailRequest request);
 
     Task<DeleteAccountResult> DeleteAccountAsync(DeleteAccountRequest request);
+    // ISettingsService.cs (add these two)
+  
 }

@@ -41,11 +41,16 @@ public partial class Settings
     private bool isDeleting;
     private bool showDeleteConfirm;
 
+
+    
+
     protected override async Task OnInitializedAsync()
     {
         if (!AuthState.IsLoggedIn) { Navigation.NavigateTo("/login"); }
         await Task.CompletedTask;
     }
+
+    
 
 
 
@@ -138,6 +143,10 @@ public partial class Settings
             isSavingEmail = false;
         }
     }
+
+
+    //active inactive
+
 
     // Step 1: the user clicked "Delete my account" — ask them to confirm.
     private void StartDeleteConfirm()

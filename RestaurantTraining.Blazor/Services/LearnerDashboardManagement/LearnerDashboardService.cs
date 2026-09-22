@@ -76,5 +76,58 @@ public class LearnerDashboardService : ILearnerDashboardService
             : null;
     }
 
+    public async Task<ResourceQuestionModel?> GetResourceQuestionAsync(int resourceId)
+    {
+        var response = await _http.GetAsync($"/api/learner/resources/{resourceId}/question");
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<ResourceQuestionModel>()
+            : null;   // 404 = no question for this resource
+    }
+
+    public async Task<ResourceAnswerResultModel?> SubmitResourceAnswerAsync(int resourceId, int selectedOptionId)
+    {
+        var response = await _http.PostAsJsonAsync(
+            $"/api/learner/resources/{resourceId}/answer",
+            new ResourceAnswerRequest { SelectedOptionId = selectedOptionId });
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<ResourceAnswerResultModel>()
+            : null;
+    }
+
+    public async Task<string?> GetResourceSummaryAsync(int resourceId)
+    {
+        var response = await _http.GetAsync($"/api/learner/resources/{resourceId}/summary");
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var payload = await response.Content.ReadFromJsonAsync<SummaryPayload>();
+        return payload?.SummaryText;
+    }
+
+    private class SummaryPayload
+    {
+        public string SummaryText { get; set; } = string.Empty;
+    }
+
+    public async Task<ScenarioModel?> GetScenarioAsync(int moduleId)
+    {
+        var response = await _http.GetAsync($"/api/learner/scenarios/module/{moduleId}");
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<ScenarioModel>()
+            : null;
+    }
+
+    public async Task<ScenarioReplyResult?> ReplyToScenarioAsync(int scenarioId, List<ScenarioChatMessage> messages)
+    {
+        var response = await _http.PostAsJsonAsync(
+            $"/api/learner/scenarios/{scenarioId}/reply",
+            new ScenarioReplyRequest { Messages = messages });
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<ScenarioReplyResult>()
+            : null;
+    }
+
 
 }

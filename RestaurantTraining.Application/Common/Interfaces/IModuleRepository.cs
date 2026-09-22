@@ -22,5 +22,10 @@ namespace RestaurantTraining.Application.Common.Interfaces
         Task DeleteModuleAsync(
             Module module,
             CancellationToken cancellationToken);
+
+        Task<int> GetLessonCountForModuleAsync(
+    int moduleId,
+    CancellationToken cancellationToken);
+
     }
 }

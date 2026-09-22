@@ -39,6 +39,8 @@ builder.Services.AddScoped<RestaurantTraining.Blazor.Services.ProfileManagement.
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<RestaurantTraining.Blazor.Services.LearnerExplore.IExploreService,
     RestaurantTraining.Blazor.Services.LearnerExplore.ExploreService>();
+builder.Services.AddScoped<RestaurantTraining.Blazor.Services.AssistantManagement.IAssistantService,
+    RestaurantTraining.Blazor.Services.AssistantManagement.AssistantService>();
 
 
 var app = builder.Build();   //web app instance

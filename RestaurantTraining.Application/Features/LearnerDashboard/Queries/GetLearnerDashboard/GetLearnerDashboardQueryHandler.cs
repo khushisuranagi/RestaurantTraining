@@ -39,6 +39,9 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetLe
             var aiScenariosCompleted = await _repository.GetPassedScenarioCountAsync(
                 request.UserId, cancellationToken);
 
+            var totalPoints = await _repository.GetResourceQuestionPointsAsync(
+                request.UserId, cancellationToken);
+
             return new LearnerDashboardDto
             {
                 LessonsCompleted = modules.Sum(x => x.CompletedLessons),
@@ -54,6 +57,7 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetLe
                 CertificatesPending = certificatesPending,
 
                 AiScenariosCompleted = aiScenariosCompleted,
+                TotalPoints = totalPoints,
 
                 PendingModules = modules
                     .Where(x => x.HasStarted && !x.IsCompleted)

@@ -13,4 +13,23 @@ public class PeopleService : IPeopleService
         return await _http.GetFromJsonAsync<List<PeopleRoleGroup>>(
             "/api/content-creator/people") ?? [];
     }
+
+    public async Task<LearnerProfileModel?> GetLearnerProfileAsync(int userId)
+    {
+        var response = await _http.GetAsync($"/api/content-creator/people/{userId}");
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<LearnerProfileModel>()
+            : null;
+    }
+
+    public async Task<SetLearnerActiveStatusResponse?> SetLearnerActiveStatusAsync(int userId, bool isActive)
+    {
+        var response = await _http.PatchAsJsonAsync(
+            $"/api/content-creator/people/{userId}/status",
+            new SetLearnerActiveStatusRequest { IsActive = isActive });
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<SetLearnerActiveStatusResponse>()
+            : null;
+    }
 }

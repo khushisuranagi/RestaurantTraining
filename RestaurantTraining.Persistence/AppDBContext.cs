@@ -39,6 +39,14 @@ namespace RestaurantTraining.Persistence
         public DbSet<Certificate> Certificates { get; set; }
 
         public DbSet<ModuleCertificateSetting> ModuleCertificateSettings { get; set; }
+
+        public DbSet<ResourceQuestion> ResourceQuestions { get; set; }
+
+        public DbSet<ResourceQuestionOption> ResourceQuestionOptions { get; set; }
+
+        public DbSet<ResourceQuestionAttempt> ResourceQuestionAttempts { get; set; }
+
+        public DbSet<ResourceSummary> ResourceSummaries { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

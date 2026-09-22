@@ -1,0 +1,212 @@
+@page "/learner/scenario/{ModuleId:int}"
+@using RestaurantTraining.Blazor.Models
+@using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Services.LearnerDashboardManagement
+@inject ILearnerDashboardService LearnerDashboardService
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Practice Scenario</PageTitle>
+
+<div class="scenario-page">
+
+    <button class="back-button" @onclick='() => Navigation.NavigateTo($"/learner/quiz/{ModuleId}")'>
+        ← Back
+    </button>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <p>Preparing your practice scenario...</p>
+            <div class="spinner" role="status" aria-label="Loading"></div>
+        </div>
+    }
+    else if (scenario is null)
+    {
+        <div class="empty-state">
+            <h2>No scenario available</h2>
+            <p>A practice scenario could not be prepared for this module right now.</p>
+        </div>
+    }
+    else
+    {
+        <p class="eyebrow">PRACTICE SCENARIO</p>
+        <h1>@scenario.Title</h1>
+        <p class="scenario-desc">@scenario.Description</p>
+
+        @if (alreadyDone)
+        {
+            <div class="scenario-result passed">
+                <h2>✓ You've already completed this practice.</h2>
+                <div class="result-actions">
+                    <button class="back-button" @onclick='() => Navigation.NavigateTo("/learner-dashboard")'>Back to dashboard</button>
+                    <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/learner/certificates")'>View my certificates</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="chat-window">
+                @if (messages.Count == 0)
+                {
+                    <p class="chat-hint">Start the conversation — greet the customer and find out how you can help.</p>
+                }
+                @foreach (var m in messages)
+                {
+                    <div class="chat-row @(m.FromLearner ? "me" : "them")">
+                        <div class="chat-bubble">@m.Text</div>
+                    </div>
+                }
+                @if (sending)
+                {
+                    <div class="chat-row them">
+                        <div class="chat-bubble typing">…</div>
+                    </div>
+                }
+            </div>
+
+            @if (!ended)
+            {
+                <div class="chat-input">
+                    <input type="text"
+                           placeholder="Type your reply to the customer..."
+                           @bind="draft"
+                           @bind:event="oninput"
+                           @onkeydown="OnKeyDown" />
+                    <button class="primary-btn"
+                            disabled="@(sending || string.IsNullOrWhiteSpace(draft))"
+                            @onclick="Send">
+                        @(sending ? "Sending..." : "Send")
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <p class="scenario-error">@error</p>
+                }
+            }
+            else if (passed)
+            {
+                <div class="scenario-result passed">
+                    <h2>✓ The customer is satisfied — you passed!</h2>
+                    @if (!string.IsNullOrWhiteSpace(feedback))
+                    {
+                        <p class="scenario-feedback">@feedback</p>
+                    }
+                    @if (certificateIssued)
+                    {
+                        <p class="cert-earned">🎉 Certificate earned! You've completed this module.</p>
+                    }
+                    <div class="result-actions">
+                        <button class="back-button" @onclick='() => Navigation.NavigateTo("/learner-dashboard")'>Back to dashboard</button>
+                        <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/learner/certificates")'>View my certificates</button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="scenario-result failed">
+                    <h2>The customer wasn't satisfied this time.</h2>
+                    @if (!string.IsNullOrWhiteSpace(feedback))
+                    {
+                        <p class="scenario-feedback">@feedback</p>
+                    }
+                    <div class="result-actions">
+                        <button class="back-button" @onclick='() => Navigation.NavigateTo("/learner-dashboard")'>Back to dashboard</button>
+                        <button class="primary-btn" @onclick="Retry">Try again</button>
+                    </div>
+                </div>
+            }
+        }
+    }
+
+</div>
+
+@code {
+    [Parameter] public int ModuleId { get; set; }
+
+    private ScenarioModel? scenario;
+    private bool isLoading = true;
+    private bool alreadyDone;
+
+    private List<ScenarioChatMessage> messages = [];
+    private string draft = string.Empty;
+    private bool sending;
+    private bool ended;
+    private bool passed;
+    private bool certificateIssued;
+    private string feedback = string.Empty;
+    private string error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator")
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        try
+        {
+            scenario = await LearnerDashboardService.GetScenarioAsync(ModuleId);
+            if (scenario is not null && scenario.AlreadyPassed)
+                alreadyDone = true;
+        }
+        finally { isLoading = false; }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !sending && !string.IsNullOrWhiteSpace(draft))
+            await Send();
+    }
+
+    private async Task Send()
+    {
+        if (scenario is null || string.IsNullOrWhiteSpace(draft)) return;
+
+        var text = draft.Trim();
+        draft = string.Empty;
+        messages.Add(new ScenarioChatMessage { FromLearner = true, Text = text });
+
+        sending = true;
+        error = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var res = await LearnerDashboardService.ReplyToScenarioAsync(scenario.ScenarioId, messages);
+
+            if (res is null)
+            {
+                error = "The customer didn't respond. Please try sending again.";
+                return;
+            }
+
+            messages.Add(new ScenarioChatMessage { FromLearner = false, Text = res.Reply });
+            feedback = res.Feedback;
+
+            if (res.Ended)
+            {
+                ended = true;
+                passed = res.Passed;
+                certificateIssued = res.CertificateIssued;
+            }
+        }
+        catch
+        {
+            error = "Something went wrong. Please try again.";
+        }
+        finally { sending = false; }
+    }
+
+    private void Retry()
+    {
+        messages.Clear();
+        ended = false;
+        passed = false;
+        certificateIssued = false;
+        feedback = string.Empty;
+        error = string.Empty;
+    }
+}

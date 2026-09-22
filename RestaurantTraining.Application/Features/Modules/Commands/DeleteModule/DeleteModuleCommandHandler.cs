@@ -18,7 +18,6 @@ namespace RestaurantTraining.Application.Features.Modules.Commands.DeleteModule
             DeleteModuleCommand request,
             CancellationToken cancellationToken)
         {
-            // Find the module first so we know it exists.
             var module = await _moduleRepository.GetModuleByIdAsync(
                 request.ModuleId,
                 cancellationToken);
@@ -29,6 +28,18 @@ namespace RestaurantTraining.Application.Features.Modules.Commands.DeleteModule
                 {
                     Success = false,
                     Message = "Module not found."
+                };
+            }
+
+            var lessonCount = await _moduleRepository.GetLessonCountForModuleAsync(
+                request.ModuleId, cancellationToken);
+
+            if (lessonCount > 0)
+            {
+                return new BaseResponse
+                {
+                    Success = false,
+                    Message = $"This module still has {lessonCount} lesson(s). Delete all lessons in this module before deleting the module itself."
                 };
             }
 

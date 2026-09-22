@@ -37,7 +37,7 @@ public partial class LearnerDashboard
 
     private void ContinueLearning()
     {
-       //goes to first oending module
+        //goes to first pending module
         var next = dashboard?.PendingModules
             .FirstOrDefault(m => !m.IsCompleted);
 

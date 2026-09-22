@@ -52,6 +52,7 @@ public class LearnerDashboardModel
     public int CertificatesEarned { get; set; }
     public int CertificatesPending { get; set; }
     public int AiScenariosCompleted { get; set; }
+    public int TotalPoints { get; set; }
     public List<LearnerDashboardModuleModel> PendingModules { get; set; } = [];
 }
 

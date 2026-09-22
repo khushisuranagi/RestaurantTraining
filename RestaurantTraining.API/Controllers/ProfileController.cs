@@ -38,6 +38,9 @@ public class ProfileController : ControllerBase
 
     // PUT /api/profile  update the signed-in user's own name & phone
     [HttpPut]
+
+
+
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command)
     {
         var userId = GetCurrentUserId();

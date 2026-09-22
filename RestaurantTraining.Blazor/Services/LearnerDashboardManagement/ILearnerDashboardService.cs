@@ -13,4 +13,15 @@ public interface ILearnerDashboardService
     Task<ArticlePreviewModel?> GetArticlePreviewAsync(string url);
     Task<byte[]?> DownloadCertificatePdfAsync(int certificateId);
     Task RecordModuleOpenedAsync(int moduleId);
+
+    // AI MCQ for a lesson resource.
+    Task<ResourceQuestionModel?> GetResourceQuestionAsync(int resourceId);
+    Task<ResourceAnswerResultModel?> SubmitResourceAnswerAsync(int resourceId, int selectedOptionId);
+
+    // AI summary of a lesson resource's content.
+    Task<string?> GetResourceSummaryAsync(int resourceId);
+
+    // AI practice scenario.
+    Task<ScenarioModel?> GetScenarioAsync(int moduleId);
+    Task<ScenarioReplyResult?> ReplyToScenarioAsync(int scenarioId, List<ScenarioChatMessage> messages);
 }

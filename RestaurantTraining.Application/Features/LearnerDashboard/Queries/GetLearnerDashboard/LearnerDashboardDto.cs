@@ -17,6 +17,9 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetLe
 
         public int AiScenariosCompleted { get; set; }
 
+        // Points earned from lesson-resource MCQs.
+        public int TotalPoints { get; set; }
+
         // Started but not finished yet.
         public List<PendingModuleDto> PendingModules { get; set; } = [];
     }

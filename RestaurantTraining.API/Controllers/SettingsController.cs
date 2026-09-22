@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantTraining.Application.Features.Auth.Commands.ChangePassword;
 using RestaurantTraining.Application.Features.Auth.Commands.DeleteAccount;
-using RestaurantTraining.Application.Features.Auth.Commands.UpdateEmail;   // add to usings
+using RestaurantTraining.Application.Features.Auth.Commands.UpdateEmail;   
+
+
+using System.Security.Claims;
 
 namespace RestaurantTraining.API.Controllers;
 
@@ -21,7 +24,7 @@ public class SettingsController : ControllerBase
 
     private int? GetCurrentUserId()
     {
-        var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return int.TryParse(claim, out var id) ? id : null;
     }
 
@@ -83,4 +86,7 @@ public class SettingsController : ControllerBase
 
         return Ok(result);
     }
+
+
+   
 }

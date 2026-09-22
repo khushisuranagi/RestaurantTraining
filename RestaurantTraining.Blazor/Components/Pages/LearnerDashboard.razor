@@ -1,8 +1,11 @@
 ﻿@page "/learner-dashboard"
 
 @using RestaurantTraining.Blazor.Services
+@using RestaurantTraining.Blazor.Components.Shared
 
 <PageTitle>Dashboard</PageTitle>
+
+<AiChatWidget />
 
 <div class="learner-page">
 
@@ -12,6 +15,7 @@
     }
     else
     {
+       
         @* ---- Welcome banner ---- *@
         <div class="welcome-banner">
             <div>
@@ -38,13 +42,6 @@
             </div>
 
             <div class="stat-card">
-                <span class="stat-icon">✅</span>
-                <strong>@(dashboard?.QuizzesAttempted ?? 0)</strong>
-                <span class="stat-label">Quizzes Attempted</span>
-                <small>of @(dashboard?.TotalQuizzes ?? 0) total</small>
-            </div>
-
-            <div class="stat-card">
                 <span class="stat-icon">🏅</span>
                 <strong>@(dashboard?.CertificatesEarned ?? 0)</strong>
                 <span class="stat-label">Certificates</span>
@@ -56,6 +53,13 @@
                 <strong>@(dashboard?.AiScenariosCompleted ?? 0)</strong>
                 <span class="stat-label">AI Scenarios</span>
                 <small>Completed</small>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">⭐</span>
+                <strong>@(dashboard?.TotalPoints ?? 0)</strong>
+                <span class="stat-label">Total Points</span>
+                <small>from lesson questions</small>
             </div>
 
         </div>

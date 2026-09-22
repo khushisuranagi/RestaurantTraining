@@ -68,26 +68,12 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Commands.SubmitQui
 
             var passed = percentage >= passingScore;
 
-            // Auto-issue a certificate on a pass (only once per learner + module).
-            string? certificateNumber = null;
-            var certificateIssued = false;
-
-            if (passed)
-            {
-                var alreadyIssued = await _repository.HasCertificateAsync(
-                    request.UserId, request.ModuleId, cancellationToken);
-
-                if (!alreadyIssued)
-                {
-                    certificateNumber =
-                        $"CERT-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
-                    certificateIssued = true;
-                }
-            }
-
+            // The quiz no longer issues the certificate on its own — the learner
+            // must also pass the AI practice scenario. So we just record the attempt;
+            // the scenario step issues the certificate once BOTH are passed.
             await _repository.RecordAttemptAsync(
                 request.UserId, request.ModuleId, score, totalMarks,
-                passed, certificateNumber, cancellationToken);
+                passed, certificateNumber: null, cancellationToken);
 
             var moduleName = await _repository.GetModuleNameAsync(
                 request.ModuleId, cancellationToken);
@@ -103,8 +89,8 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Commands.SubmitQui
                     Passed = passed,
                     CorrectCount = correctCount,
                     TotalQuestions = questions.Count,
-                    CertificateIssued = certificateIssued,
-                    CertificateNumber = certificateNumber,
+                    CertificateIssued = false,   // issued after the practice scenario
+                    CertificateNumber = null,
                     ModuleName = moduleName
                 }
             };

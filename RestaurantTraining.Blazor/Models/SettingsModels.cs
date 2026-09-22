@@ -7,6 +7,12 @@ public class ChangePasswordRequest
     public string ConfirmNewPassword { get; set; } = string.Empty;
 }
 
+
+
+
+
+
+
 public class ChangePasswordResult
 {
     public bool Success { get; set; }

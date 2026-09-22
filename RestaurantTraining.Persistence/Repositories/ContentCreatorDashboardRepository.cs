@@ -71,6 +71,7 @@ namespace RestaurantTraining.Persistence.Repositories
             CancellationToken cancellationToken)
         {
             return await _context.Users
+                .Where(u => u.IsActive)
                 .Select(u => u.RoleId)
                 .ToListAsync(cancellationToken);
         }
@@ -88,35 +89,40 @@ namespace RestaurantTraining.Persistence.Repositories
         public async Task<int> GetCertificateCountAsync(
             CancellationToken cancellationToken)
         {
-            return await _context.Certificates.CountAsync(cancellationToken);
+            return await _context.Certificates
+        .Where(c => _context.Users.Any(u => u.UserId == c.UserId && u.IsActive))
+        .CountAsync(cancellationToken);
         }
 
         public async Task<int> GetDistinctCertificateLearnerCountAsync(
             CancellationToken cancellationToken)
         {
             return await _context.Certificates
-                .Select(c => c.UserId)
-                .Distinct()
-                .CountAsync(cancellationToken);
+        .Where(c => _context.Users.Any(u => u.UserId == c.UserId && u.IsActive))
+        .Select(c => c.UserId)
+        .Distinct()
+        .CountAsync(cancellationToken);
         }
 
         public async Task<int> GetActiveLearnerCountAsync(
             CancellationToken cancellationToken)
         {
             return await _context.LessonProgress
-                .Where(p => p.IsCompleted)
-                .Select(p => p.UserId)
-                .Distinct()
-                .CountAsync(cancellationToken);
+        .Where(p => p.IsCompleted
+                 && _context.Users.Any(u => u.UserId == p.UserId && u.IsActive))
+        .Select(p => p.UserId)
+        .Distinct()
+        .CountAsync(cancellationToken);
         }
 
         public async Task<List<DashboardRecentCertificateInfo>> GetRecentCertificatesAsync(
-            int take, CancellationToken cancellationToken)
+     int take, CancellationToken cancellationToken)
         {
             return await (
                 from c in _context.Certificates
                 join u in _context.Users on c.UserId equals u.UserId
                 join m in _context.Modules on c.ModuleId equals m.ModuleId
+                where u.IsActive
                 orderby c.IssuedDate descending
                 select new DashboardRecentCertificateInfo
                 {

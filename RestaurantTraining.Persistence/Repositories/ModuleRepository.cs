@@ -56,5 +56,13 @@ namespace RestaurantTraining.Persistence.Repositories
             _context.Modules.Remove(module);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<int> GetLessonCountForModuleAsync(
+    int moduleId,
+    CancellationToken cancellationToken)
+        {
+            return await _context.Lessons
+                .CountAsync(l => l.ModuleId == moduleId, cancellationToken);
+        }
     }
 }
