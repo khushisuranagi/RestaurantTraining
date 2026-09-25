@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.DashboardManagement;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.DashboardManagement;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class ContentCreatorDashboard
 {

@@ -1,10 +1,10 @@
 using System.Net.Http;
 using Microsoft.AspNetCore.Components;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.SettingsManagement;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.SettingsManagement;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class Settings
 {

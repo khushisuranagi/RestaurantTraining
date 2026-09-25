@@ -1,6 +1,6 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.QuizManagement;
+namespace RestaurantTraining.Web.Services.QuizManagement;
 
 public interface IQuizService
 {

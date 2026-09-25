@@ -1,5 +1,5 @@
 @page "/content-creator-dashboard"
-@using RestaurantTraining.Blazor.Components.Shared
+@using RestaurantTraining.Web.Components.Shared
 
 <PageTitle>Content Creator Dashboard</PageTitle>
 
@@ -36,6 +36,11 @@
             <div class="stat-card"><span>Lessons</span><strong>@data.LessonCount</strong><small>Across all modules</small></div>
             <div class="stat-card"><span>Quiz Questions</span><strong>@data.QuizQuestionCount</strong><small>@data.ModulesAssignedCount modules assigned</small></div>
             <div class="stat-card"><span>Certificates Issued</span><strong>@data.CertificatesIssued</strong><small>to learners</small></div>
+        </section>
+
+
+        <section class="dashboard-section">
+            <Leaderboard ShowYourRank="false" />
         </section>
 
         <div class="dash-columns">

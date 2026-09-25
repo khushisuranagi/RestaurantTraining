@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.ModuleManagement;
-using RestaurantTraining.Blazor.Services.QuizManagement;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.ModuleManagement;
+using RestaurantTraining.Web.Services.QuizManagement;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class QuizManagement
 {

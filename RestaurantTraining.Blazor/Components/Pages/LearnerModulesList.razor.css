@@ -42,6 +42,11 @@
 .progress-fill { height:100%; background:#1c39bb; border-radius:999px; transition:width .3s ease; }
 .mod-percent { color:#64748b; font-size:.85rem; white-space:nowrap; }
 .mod-done { color:#166534; font-size:.85rem; font-weight:600; white-space:nowrap; }
+.mod-stage-badge {
+    display:inline-block;/* margin-top:8px; padding:.2rem .6rem; border-radius:999px;
+    background:#fff7ed; color:#b45309; border:1px solid #fed7aa;*/
+    font-size:.75rem; font-weight:600;
+}
 
 .mod-btn {
     flex-shrink:0; padding:.55rem 1.1rem; border-radius:9px; font-weight:700; font-size:.85rem; cursor:pointer; transition:.2s ease;

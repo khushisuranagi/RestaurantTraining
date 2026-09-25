@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services.LessonManagement;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services.LessonManagement;
 using RestaurantTraining.Domain.Enums;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class ContentCreatorLesson
 {

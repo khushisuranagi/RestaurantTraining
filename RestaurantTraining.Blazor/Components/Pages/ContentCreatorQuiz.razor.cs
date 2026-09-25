@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.CertificateManagement;
-using RestaurantTraining.Blazor.Services.QuizManagement;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.CertificateManagement;
+using RestaurantTraining.Web.Services.QuizManagement;
 using RestaurantTraining.Domain.Enums;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class ContentCreatorQuiz
 {

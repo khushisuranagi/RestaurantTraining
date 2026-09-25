@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.QuizManagement;
+namespace RestaurantTraining.Web.Services.QuizManagement;
 
 public class QuizService : IQuizService
 {

@@ -34,7 +34,33 @@ namespace RestaurantTraining.Persistence.Repositories
                 }
             ).ToListAsync(cancellationToken);
 
-            var moduleIds = assignedModules
+            // Self-enrolled Explore modules: not assigned to the learner's role, but
+            // the learner has started them (has a ModuleProgress row). Include them so
+            // they track exactly like assigned modules — progress, quiz, scenario,
+            // certificate and completion all flow through the same code below.
+            var assignedModuleIds = assignedModules.Select(x => x.ModuleId).ToList();
+
+            var enrolledModules = await (
+                from moduleProgress in _context.ModuleProgress
+                join module in _context.Modules
+                    on moduleProgress.ModuleId equals module.ModuleId
+                where moduleProgress.UserId == userId
+                      && module.IsActive
+                      && !assignedModuleIds.Contains(module.ModuleId)
+                select new
+                {
+                    module.ModuleId,
+                    module.ModuleName,
+                    module.Description,
+                    AssignedAt = moduleProgress.StartedAt,
+                    module.CoverImageData,
+                    module.CoverImageContentType
+                }
+            ).ToListAsync(cancellationToken);
+
+            var allModules = assignedModules.Concat(enrolledModules).ToList();
+
+            var moduleIds = allModules
                 .Select(x => x.ModuleId)
                 .ToList();
 
@@ -56,6 +82,14 @@ namespace RestaurantTraining.Persistence.Repositories
                 .ToListAsync(cancellationToken))
                 .ToHashSet();
 
+            // A certificate is only issued after BOTH the quiz and the practice
+            // scenario are passed, so it is the true "module complete" signal.
+            var certificateDateByModuleId = (await _context.Certificates
+                .Where(x => x.UserId == userId && moduleIds.Contains(x.ModuleId))
+                .ToListAsync(cancellationToken))
+                .GroupBy(x => x.ModuleId)
+                .ToDictionary(g => g.Key, g => g.Min(c => c.IssuedDate));
+
             var progressByModuleId = (await _context.ModuleProgress
                 .Where(x => x.UserId == userId && moduleIds.Contains(x.ModuleId))
                 .ToListAsync(cancellationToken))
@@ -63,7 +97,7 @@ namespace RestaurantTraining.Persistence.Repositories
 
             var states = new List<LearnerModuleStateInfo>();
 
-            foreach (var module in assignedModules)
+            foreach (var module in allModules)
             {
                 var moduleLessons = lessons
                     .Where(x => x.ModuleId == module.ModuleId)
@@ -79,9 +113,12 @@ namespace RestaurantTraining.Persistence.Repositories
                     completedLessons == totalLessons;
 
                 var quizPassed = passedModuleIdSet.Contains(module.ModuleId);
+                var hasCertificate = certificateDateByModuleId.ContainsKey(module.ModuleId);
 
-                // Module completion requires all lessons and a passed quiz.
-                var shouldBeCompleted = allLessonsCompleted && quizPassed;
+                // Complete ONLY once the certificate is issued — that happens after
+                // the quiz AND the practice scenario are both passed. Lessons + quiz
+                // alone keep the module "in progress".
+                var shouldBeCompleted = hasCertificate;
 
                 progressByModuleId.TryGetValue(
                     module.ModuleId,
@@ -93,7 +130,7 @@ namespace RestaurantTraining.Persistence.Repositories
                 {
                     moduleProgress.IsCompleted = shouldBeCompleted;
                     moduleProgress.CompletedAt = shouldBeCompleted
-                        ? DateTime.UtcNow
+                        ? certificateDateByModuleId[module.ModuleId]
                         : null;
                 }
 
@@ -107,7 +144,9 @@ namespace RestaurantTraining.Persistence.Repositories
                     StartedAt = moduleProgress?.StartedAt,
                     LastAccessedAt = moduleProgress?.LastAccessedAt,
                     IsCompleted = shouldBeCompleted,
-                    CompletedAt = moduleProgress?.CompletedAt,
+                    CompletedAt = shouldBeCompleted
+                        ? certificateDateByModuleId[module.ModuleId]
+                        : moduleProgress?.CompletedAt,
                     TotalLessons = totalLessons,
                     CompletedLessons = completedLessons,
                     QuizPassed = quizPassed,

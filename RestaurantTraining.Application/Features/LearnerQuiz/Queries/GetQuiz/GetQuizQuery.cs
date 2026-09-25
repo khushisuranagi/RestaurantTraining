@@ -7,6 +7,7 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Queries.GetQuiz
     public class GetQuizQuery : IRequest<LearnerQuizDto?>
     {
         public string RoleName { get; set; } = string.Empty;
+        public int UserId { get; set; }
         public int ModuleId { get; set; }
     }
 }

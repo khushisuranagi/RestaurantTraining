@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.ModuleManagement;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.ModuleManagement;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class ContentCreatorModules
 {
@@ -16,7 +16,7 @@ public partial class ContentCreatorModules
     [Inject]
     private IModuleService ModuleService { get; set; } = default!;
     [Inject]
-    private RestaurantTraining.Blazor.Services.LessonManagement.ILessonManagementService LessonManagementService { get; set; } = default!;
+    private RestaurantTraining.Web.Services.LessonManagement.ILessonManagementService LessonManagementService { get; set; } = default!;
     private enum ResourceType
     {
         Video,
@@ -724,7 +724,7 @@ public partial class ContentCreatorModules
                 contentType = row.File.ContentType;
             }
 
-            var request = new RestaurantTraining.Blazor.Models.SaveLessonResourceRequest
+            var request = new RestaurantTraining.Web.Models.SaveLessonResourceRequest
             {
                 ResourceId = row.ResourceId,
                 LessonId = lessonId,

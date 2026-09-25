@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.PeopleManagement;
+namespace RestaurantTraining.Web.Services.PeopleManagement;
 
 public class PeopleService : IPeopleService
 {

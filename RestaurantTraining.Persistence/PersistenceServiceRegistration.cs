@@ -38,6 +38,7 @@ namespace RestaurantTraining.Persistence
             services.AddScoped<IResourceQuestionRepository, ResourceQuestionRepository>();
             services.AddScoped<IResourceSummaryRepository, ResourceSummaryRepository>();
             services.AddScoped<ICertificateIssuanceRepository, CertificateIssuanceRepository>();
+            services.AddScoped<ILeaderboardRepository, LeaderboardRepository>();
 
             return services;
         }

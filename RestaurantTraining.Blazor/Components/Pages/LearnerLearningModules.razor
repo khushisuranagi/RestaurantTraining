@@ -1,5 +1,5 @@
 @page "/learning-modules/{ModuleId:int}"
-@using RestaurantTraining.Blazor.Services.LearnerDashboardManagement
+@using RestaurantTraining.Web.Services.LearnerDashboardManagement
 @using RestaurantTraining.Domain.Enums
 @inject ILearnerDashboardService LearnerDashboardService
 @inject AuthState AuthState
@@ -326,8 +326,12 @@
 
             if (module is not null && module.Lessons.Count > 0)
             {
+                // Resume where the learner left off: the first lesson they haven't
+                // finished. If every lesson is already done (module is on the quiz/
+                // scenario stage), land on the LAST lesson so they get the "Take Quiz"
+                // button instead of being sent back to lesson 1.
                 var firstIncomplete = module.Lessons.FindIndex(l => !l.IsCompleted);
-                currentIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
+                currentIndex = firstIncomplete >= 0 ? firstIncomplete : module.Lessons.Count - 1;
                 await LoadArticlePreviewsForCurrentLesson();
                 await LoadQuestionsForCurrentLesson();
             }

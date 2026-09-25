@@ -1,6 +1,6 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.LearnerExplore;
+namespace RestaurantTraining.Web.Services.LearnerExplore;
 
 public interface IExploreService
 {

@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Json;
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.LearnerDashboardManagement;
+namespace RestaurantTraining.Web.Services.LearnerDashboardManagement;
 
 public class LearnerDashboardService : ILearnerDashboardService
 {

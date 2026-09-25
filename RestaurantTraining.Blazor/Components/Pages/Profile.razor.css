@@ -70,3 +70,14 @@
     background:#fff; color:#b91c1c; font-weight:700; cursor:pointer; transition:.2s ease;
 }
 .logout-btn:hover { background:#fef2f2; }
+
+.profile-award {
+    display: inline-block;
+    margin-top: .5rem;
+    padding: .3rem .8rem;
+    border-radius: 999px;
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 700;
+    font-size: .8rem;
+}

@@ -1,6 +1,6 @@
-﻿using RestaurantTraining.Blazor.Models;
+﻿using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.SettingsManagement;
+namespace RestaurantTraining.Web.Services.SettingsManagement;
 
 public interface ISettingsService
 {

@@ -38,9 +38,13 @@ namespace RestaurantTraining.Infrastructure.CertificateManagement
                             // Brand row
                             col.Item().AlignCenter().Row(row =>
                             {
-                                row.AutoItem().Height(28).Width(28)
-                                    .Background(BrandBlue)
-                                    .Container();
+                                row.AutoItem().Height(28).Width(28).Svg($"""
+                                    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="16" cy="16" r="15" fill="{BrandBlue}" />
+                                        <circle cx="16" cy="16" r="8.5" fill="none" stroke="#ffffff" stroke-width="2" />
+                                        <circle cx="16" cy="16" r="3" fill="#ffffff" />
+                                    </svg>
+                                    """);
 
                                 row.AutoItem().PaddingLeft(10).Column(brand =>
                                 {
@@ -88,9 +92,16 @@ namespace RestaurantTraining.Infrastructure.CertificateManagement
                             }
 
                             col.Item().PaddingTop(20).AlignCenter()
-                                .Width(46).Height(46)
-                                .Background(BrandBlue)
-                                .Container();
+                                .Width(48).Height(64).Svg($"""
+                                    <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                         stroke="{BrandBlue}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M19 32 L14 60 L22 53" />
+                                        <path d="M29 32 L34 60 L26 53" />
+                                        <circle cx="24" cy="22" r="15" />
+                                        <polygon points="24,15 25.76,19.57 30.66,19.84 26.85,22.93 28.11,27.66 24,25 19.89,27.66 21.15,22.93 17.34,19.84 22.24,19.57"
+                                                 fill="{BrandBlue}" stroke="none" />
+                                    </svg>
+                                    """);
 
                             col.Item().PaddingTop(15).AlignCenter()
                                 .Text($"{data.CertificateNumber} · Issued {data.IssuedDate:MMM d, yyyy}")

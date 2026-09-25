@@ -19,7 +19,7 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Queries.GetQuiz
             CancellationToken cancellationToken)
         {
             var isAssigned = await _repository.IsAssignedToLearnerAsync(
-                request.RoleName, request.ModuleId, cancellationToken);
+                request.RoleName, request.UserId, request.ModuleId, cancellationToken);
 
             if (!isAssigned)
                 return null;

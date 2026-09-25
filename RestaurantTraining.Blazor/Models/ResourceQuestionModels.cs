@@ -1,4 +1,4 @@
-namespace RestaurantTraining.Blazor.Models;
+namespace RestaurantTraining.Web.Models;
 
 // The AI MCQ shown under a lesson resource (no correct answer included).
 public class ResourceQuestionModel

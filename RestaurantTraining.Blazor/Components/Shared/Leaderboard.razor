@@ -1,0 +1,70 @@
+﻿@using RestaurantTraining.Web.Models
+@using RestaurantTraining.Web.Services.LeaderboardManagement
+@inject ILeaderboardService LeaderboardService
+
+<div class="leaderboard">
+    <div class="lb-head">
+        <h2>🏆 Top Performers</h2>
+        <p>Ranked by points earned from lesson questions</p>
+    </div>
+
+    @if (isLoading)
+    {
+        <p class="lb-muted">Loading leaderboard...</p>
+    }
+    else if (data is null || data.Top.Count == 0)
+    {
+        <p class="lb-muted">No points earned yet — answer lesson questions to climb the board!</p>
+    }
+    else
+    {
+        <ol class="lb-list">
+            @foreach (var e in data.Top)
+            {
+                <li class="lb-row @(e.IsOutstanding ? "outstanding" : "")">
+                    <span class="lb-rank">@RankBadge(e.Rank)</span>
+                    <span class="lb-name">
+                        @e.FullName
+                        <small class="lb-role">@e.RoleName</small>
+                    </span>
+                    @if (e.IsOutstanding)
+                    {
+                        <span class="lb-award">Outstanding Performance</span>
+                    }
+                    <span class="lb-points">@e.Points pts</span>
+                </li>
+            }
+        </ol>
+
+        @* Show the learner their own rank only if they're NOT already in the top list *@
+        @if (ShowYourRank && data.Me is not null && data.Me.Rank > data.Top.Count)
+        {
+            <div class="lb-you">
+                <span class="lb-rank">#@data.Me.Rank</span>
+                <span class="lb-name">You <small class="lb-role">@data.Me.RoleName</small></span>
+                <span class="lb-points">@data.Me.Points pts</span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public bool ShowYourRank { get; set; }
+
+    private LeaderboardModel? data;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { data = await LeaderboardService.GetLeaderboardAsync(); }
+        finally { isLoading = false; }
+    }
+
+    private static string RankBadge(int rank) => rank switch
+    {
+        1 => "🥇",
+        2 => "🥈",
+        3 => "🥉",
+        _ => $"#{rank}"
+    };
+}

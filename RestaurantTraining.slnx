@@ -5,7 +5,7 @@
     <Project Path="RestaurantTraining.API/RestaurantTraining.API.csproj" />
   </Folder>
   <Folder Name="/src/RestaurantTraining/Blazor/">
-    <Project Path="RestaurantTraining.Blazor/RestaurantTraining.Blazor.csproj" Id="1d2df3fb-9824-46b7-82af-66044edf76fe" />
+    <Project Path="RestaurantTraining.Blazor/RestaurantTraining.Web.csproj" Id="1d2df3fb-9824-46b7-82af-66044edf76fe" />
   </Folder>
   <Folder Name="/src/RestaurantTraining/Core/">
     <Project Path="RestaurantTraining.Application/RestaurantTraining.Application.csproj" />

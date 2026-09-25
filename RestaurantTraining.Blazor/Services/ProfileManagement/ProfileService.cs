@@ -1,7 +1,7 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 using System.Net.Http.Json;
 
-namespace RestaurantTraining.Blazor.Services.ProfileManagement;
+namespace RestaurantTraining.Web.Services.ProfileManagement;
 
 public class ProfileService : IProfileService
 {

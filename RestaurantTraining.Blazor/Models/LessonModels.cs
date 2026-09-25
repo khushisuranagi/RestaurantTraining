@@ -1,6 +1,6 @@
 using RestaurantTraining.Domain.Enums;
 
-namespace RestaurantTraining.Blazor.Models;
+namespace RestaurantTraining.Web.Models;
 
 public class LessonSummary
 {

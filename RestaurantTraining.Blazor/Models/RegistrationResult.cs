@@ -1,4 +1,4 @@
-namespace RestaurantTraining.Blazor.Models
+namespace RestaurantTraining.Web.Models
 {
     public class RegistrationResult
     {

@@ -19,7 +19,7 @@ namespace RestaurantTraining.Application.Features.LearnerExplore.Queries.GetExpl
             CancellationToken cancellationToken)
         {
             var modules = await _repository.GetUnassignedModulesAsync(
-                request.RoleName, cancellationToken);
+                request.RoleName, request.UserId, cancellationToken);
 
             return modules
                 .Select(m => new ExploreModuleDto

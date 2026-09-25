@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Json;
 
-namespace RestaurantTraining.Blazor.Services.ModuleManagement;
+namespace RestaurantTraining.Web.Services.ModuleManagement;
 
 public class ModuleService : IModuleService
 {

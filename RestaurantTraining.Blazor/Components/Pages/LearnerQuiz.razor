@@ -1,8 +1,8 @@
 @page "/learner/quiz/{ModuleId:int}"
 
-@using RestaurantTraining.Blazor.Models
-@using RestaurantTraining.Blazor.Services
-@using RestaurantTraining.Blazor.Services.LearnerQuizManagement
+@using RestaurantTraining.Web.Models
+@using RestaurantTraining.Web.Services
+@using RestaurantTraining.Web.Services.LearnerQuizManagement
 @using RestaurantTraining.Domain.Enums
 
 <PageTitle>Quiz</PageTitle>
@@ -106,6 +106,33 @@
                     real-life customer situation. Chat with the customer and resolve their issue.
                 </h5>
             </div>
+
+
+            <div class="answer-review">
+    <h3 class="review-title">Review your answers</h3>
+
+    @foreach (var (item, i) in result.Review.Select((r, idx) => (r, idx)))
+    {
+        <div class="review-item @(item.IsCorrect ? "correct" : "wrong")">
+            <div class="review-head">
+                <span class="review-q">@(i + 1). @item.QuestionText</span>
+                <span class="review-badge @(item.IsCorrect ? "correct" : "wrong")">
+                    @(item.IsCorrect ? "✓ Correct" : "✗ Wrong")
+                </span>
+            </div>
+
+            <p class="review-answer">
+                Correct answer: <strong>@item.CorrectAnswer</strong>
+            </p>
+
+            @if (!string.IsNullOrWhiteSpace(item.Explanation))
+            {
+                <p class="review-explanation">@item.Explanation</p>
+            }
+        </div>
+    }
+</div>
+
 
             <div class="result-actions">
 

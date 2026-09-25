@@ -1,4 +1,4 @@
-namespace RestaurantTraining.Blazor.Services
+namespace RestaurantTraining.Web.Services
 {
     // holds the details of the user who is currently logged in, in memory so if refreshed data lost
     

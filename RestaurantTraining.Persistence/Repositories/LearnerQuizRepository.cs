@@ -14,14 +14,22 @@ namespace RestaurantTraining.Persistence.Repositories
         }
 
         public async Task<bool> IsAssignedToLearnerAsync(
-            string roleName, int moduleId, CancellationToken cancellationToken)
+            string roleName, int userId, int moduleId, CancellationToken cancellationToken)
         {
-            return await (
+            // Assigned to the learner's role...
+            var isAssigned = await (
                 from rm in _context.RoleModules
                 join r in _context.Roles on rm.RoleId equals r.RoleId
                 where r.RoleName == roleName && rm.ModuleId == moduleId
                 select rm
             ).AnyAsync(cancellationToken);
+
+            if (isAssigned)
+                return true;
+
+            // ...or self-enrolled from Explore (has a ModuleProgress row).
+            return await _context.ModuleProgress
+                .AnyAsync(mp => mp.UserId == userId && mp.ModuleId == moduleId, cancellationToken);
         }
 
         public async Task<List<QuizQuestionInfo>> GetQuizQuestionsAsync(
@@ -59,6 +67,8 @@ namespace RestaurantTraining.Persistence.Repositories
                     QuestionId = q.QuestionId,
                     QuestionType = q.QuestionType,
                     Marks = q.Marks,
+                    QuestionText = q.QuestionText,   
+                    Explanation = q.Explanation,
                     Options = _context.QuizOptions
                         .Where(o => o.QuestionId == q.QuestionId)
                         .Select(o => new GradingOptionInfo

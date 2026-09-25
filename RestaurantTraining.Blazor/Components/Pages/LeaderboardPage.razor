@@ -1,0 +1,21 @@
+﻿@page "/leaderboard"
+@using RestaurantTraining.Web.Services
+@using RestaurantTraining.Web.Components.Shared
+@inject AuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Leaderboard</PageTitle>
+
+<div style="max-width:760px; margin:0 auto; padding:24px 40px 40px;">
+    <p style="color:#1c39bb; font-size:.8rem; font-weight:700; letter-spacing:.12em; margin:0;">RANKINGS</p>
+    <h1 style="color:#12355b; margin:.35rem 0 1.25rem;">Leaderboard</h1>
+    <Leaderboard ShowYourRank="true" />
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!AuthState.IsLoggedIn || AuthState.Role == "Content Creator")
+            Navigation.NavigateTo("/login");
+    }
+}

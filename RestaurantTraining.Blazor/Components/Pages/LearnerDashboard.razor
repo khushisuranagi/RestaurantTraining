@@ -1,7 +1,8 @@
 ﻿@page "/learner-dashboard"
 
-@using RestaurantTraining.Blazor.Services
-@using RestaurantTraining.Blazor.Components.Shared
+@using RestaurantTraining.Web.Services
+@using RestaurantTraining.Web.Components.Shared
+@inject RestaurantTraining.Web.Services.LeaderboardManagement.ILeaderboardService LeaderboardService
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -15,7 +16,14 @@
     }
     else
     {
-       
+        
+
+        @if (isOutstanding)
+        {
+            <div class="outstanding-banner">
+                🏆 Outstanding Performance — you're ranked #@myRank on the leaderboard!
+            </div>
+        }
         @* ---- Welcome banner ---- *@
         <div class="welcome-banner">
             <div>

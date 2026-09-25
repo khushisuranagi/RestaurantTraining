@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Json;
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.SettingsManagement;
+namespace RestaurantTraining.Web.Services.SettingsManagement;
 
 public class SettingsService : ISettingsService
 {

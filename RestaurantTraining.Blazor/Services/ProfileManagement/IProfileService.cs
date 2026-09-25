@@ -1,6 +1,6 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.ProfileManagement;
+namespace RestaurantTraining.Web.Services.ProfileManagement;
 
 public interface IProfileService
 {

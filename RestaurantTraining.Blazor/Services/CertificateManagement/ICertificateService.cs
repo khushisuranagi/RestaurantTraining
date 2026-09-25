@@ -1,5 +1,5 @@
-﻿using RestaurantTraining.Blazor.Models;
-namespace RestaurantTraining.Blazor.Services.CertificateManagement;
+﻿using RestaurantTraining.Web.Models;
+namespace RestaurantTraining.Web.Services.CertificateManagement;
 
 public interface ICertificateService
 {

@@ -1,7 +1,7 @@
 @page "/explore/{ModuleId:int}"
-@using RestaurantTraining.Blazor.Models
-@using RestaurantTraining.Blazor.Services
-@using RestaurantTraining.Blazor.Services.LearnerExplore
+@using RestaurantTraining.Web.Models
+@using RestaurantTraining.Web.Services
+@using RestaurantTraining.Web.Services.LearnerExplore
 @using RestaurantTraining.Domain.Enums
 @inject IExploreService ExploreService
 @inject AuthState AuthState
@@ -26,6 +26,17 @@
         <p class="eyebrow">OPTIONAL MODULE</p>
         <h1>@module.ModuleName</h1>
         <p class="module-description">@module.Description</p>
+
+        <div class="explore-cta">
+            <p class="explore-cta-text">
+                Want to earn points and a certificate for this module? Take it up to unlock the
+                quiz, practice scenario and progress tracking.
+            </p>
+            <button class="explore-start-btn"
+                    @onclick='() => Navigation.NavigateTo($"/learning-modules/{ModuleId}")'>
+                Start this module →
+            </button>
+        </div>
 
         @if (module.Lessons.Count == 0)
         {

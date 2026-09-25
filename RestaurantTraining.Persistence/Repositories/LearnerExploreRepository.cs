@@ -13,7 +13,7 @@ namespace RestaurantTraining.Persistence.Repositories
         }
 
         public async Task<List<ExploreModuleInfo>> GetUnassignedModulesAsync(
-            string roleName, CancellationToken cancellationToken)
+            string roleName, int userId, CancellationToken cancellationToken)
         {
             // Module ids assigned to this learner's role.
             var assignedModuleIds =
@@ -22,9 +22,17 @@ namespace RestaurantTraining.Persistence.Repositories
                 where r.RoleName == roleName
                 select rm.ModuleId;
 
-            // Active modules that are NOT in that set.
+            // Module ids the learner has already started (self-enrolled) — these have
+            // moved into "My Learning", so drop them from Explore.
+            var startedModuleIds = _context.ModuleProgress
+                .Where(mp => mp.UserId == userId)
+                .Select(mp => mp.ModuleId);
+
+            // Active modules that are NOT assigned and NOT already started.
             return await _context.Modules
-                .Where(m => m.IsActive && !assignedModuleIds.Contains(m.ModuleId))
+                .Where(m => m.IsActive
+                            && !assignedModuleIds.Contains(m.ModuleId)
+                            && !startedModuleIds.Contains(m.ModuleId))
                 .OrderBy(m => m.ModuleName)
                 .Select(m => new ExploreModuleInfo
                 {

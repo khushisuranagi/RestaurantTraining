@@ -1,6 +1,6 @@
 ﻿
 
-namespace RestaurantTraining.Blazor.Services.ModuleManagement;
+namespace RestaurantTraining.Web.Services.ModuleManagement;
 
 public interface IModuleService
 {

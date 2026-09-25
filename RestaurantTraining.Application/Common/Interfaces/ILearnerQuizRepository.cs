@@ -6,7 +6,7 @@ namespace RestaurantTraining.Application.Common.Interfaces
     public interface ILearnerQuizRepository
     {
         Task<bool> IsAssignedToLearnerAsync(
-            string roleName, int moduleId, CancellationToken cancellationToken);
+            string roleName, int userId, int moduleId, CancellationToken cancellationToken);
 
         // Questions + options w/o the correct answers for learner
         Task<List<QuizQuestionInfo>> GetQuizQuestionsAsync(
@@ -54,9 +54,13 @@ namespace RestaurantTraining.Application.Common.Interfaces
     {
         public int QuestionId { get; set; }
         public QuestionType QuestionType { get; set; }
+        public string QuestionText { get; set; } = string.Empty;   // ADD
+        public string Explanation { get; set; } = string.Empty;
         public int Marks { get; set; }
         public List<GradingOptionInfo> Options { get; set; } = [];
     }
+
+
 
     public class GradingOptionInfo
     {

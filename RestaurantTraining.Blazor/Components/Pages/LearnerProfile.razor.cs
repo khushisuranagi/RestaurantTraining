@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.PeopleManagement;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.PeopleManagement;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class LearnerProfile
 {

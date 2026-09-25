@@ -31,12 +31,16 @@ public class LearnerQuizController : ControllerBase
     [HttpGet("{moduleId:int}")]
     public async Task<IActionResult> GetQuiz(int moduleId)
     {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Forbid();
+
         var roleName = GetRoleName();
         if (string.IsNullOrWhiteSpace(roleName)) return Forbid();
 
         var result = await _mediator.Send(new GetQuizQuery
         {
             RoleName = roleName,
+            UserId = userId.Value,
             ModuleId = moduleId
         });
 

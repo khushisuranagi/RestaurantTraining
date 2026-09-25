@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Components;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services;
-using RestaurantTraining.Blazor.Services.LearnerDashboardManagement;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services;
+using RestaurantTraining.Web.Services.LeaderboardManagement;
+using RestaurantTraining.Web.Services.LearnerDashboardManagement;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class LearnerDashboard
 {
@@ -11,6 +14,14 @@ public partial class LearnerDashboard
     [Inject] private AuthState AuthState { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
+
+ 
+
+    private bool isOutstanding;
+    private int myRank;
+
+    
+    
     private LearnerDashboardModel? dashboard;
     private bool isLoading = true;
 
@@ -25,6 +36,8 @@ public partial class LearnerDashboard
         try
         {
             dashboard = await LearnerDashboardService.GetDashboardAsync();
+            var lb = await LeaderboardService.GetLeaderboardAsync();
+            if (lb?.Me is not null) { isOutstanding = lb.Me.IsOutstanding; myRank = lb.Me.Rank; }
         }
         finally
         {

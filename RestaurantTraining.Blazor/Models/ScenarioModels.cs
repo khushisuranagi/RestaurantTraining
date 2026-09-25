@@ -1,4 +1,4 @@
-namespace RestaurantTraining.Blazor.Models;
+namespace RestaurantTraining.Web.Models;
 
 // The practice scenario shown to the learner.
 public class ScenarioModel

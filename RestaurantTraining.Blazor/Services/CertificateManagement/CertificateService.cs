@@ -1,8 +1,8 @@
-﻿using RestaurantTraining.Blazor.Models;
+﻿using RestaurantTraining.Web.Models;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace RestaurantTraining.Blazor.Services.CertificateManagement;
+namespace RestaurantTraining.Web.Services.CertificateManagement;
 
 public class CertificateService : ICertificateService
 {

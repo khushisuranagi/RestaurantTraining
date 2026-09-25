@@ -1,4 +1,4 @@
-namespace RestaurantTraining.Blazor.Models
+namespace RestaurantTraining.Web.Models
 {
     //  matches the json that the api sends back from POST /api/Auth/login.
     //  API's LoginResponse.

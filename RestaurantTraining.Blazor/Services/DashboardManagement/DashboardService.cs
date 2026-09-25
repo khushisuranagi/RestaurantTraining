@@ -1,7 +1,7 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 using System.Net.Http.Json;
 
-namespace RestaurantTraining.Blazor.Services.DashboardManagement;
+namespace RestaurantTraining.Web.Services.DashboardManagement;
 
 public class DashboardService : IDashboardService
 {

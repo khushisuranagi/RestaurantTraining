@@ -69,11 +69,15 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetLe
                         Description = x.Description,
                         CompletedLessons = x.CompletedLessons,
                         TotalLessons = x.TotalLessons,
-                        // The quiz counts as one final step, so a module can only
-                        // reach 100% once every lesson is done AND the quiz is passed.
-                        ProgressPercent = (int)Math.Round(
-                            100.0 * (x.CompletedLessons + (x.QuizPassed ? 1 : 0))
-                            / (x.TotalLessons + 1)),
+                        // Three stages: lessons, then the quiz, then the practice
+                        // scenario (denominator = lessons + quiz + scenario). A module
+                        // only reaches 100% once its certificate is issued (IsCompleted),
+                        // i.e. the scenario is passed too — matching the Learning Modules list.
+                        ProgressPercent = x.IsCompleted
+                            ? 100
+                            : (int)Math.Round(
+                                100.0 * (x.CompletedLessons + (x.QuizPassed ? 1 : 0))
+                                / (x.TotalLessons + 2)),
                         IsCompleted = x.IsCompleted
                     })
                     .ToList()

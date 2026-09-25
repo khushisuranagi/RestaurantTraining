@@ -1,6 +1,6 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.PeopleManagement;
+namespace RestaurantTraining.Web.Services.PeopleManagement;
 
 public interface IPeopleService
 {

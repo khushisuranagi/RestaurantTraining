@@ -1,6 +1,6 @@
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.LessonManagement;
+namespace RestaurantTraining.Web.Services.LessonManagement;
 
 public interface ILessonManagementService
 {

@@ -1,7 +1,7 @@
 @page "/learning-modules"
-@using RestaurantTraining.Blazor.Models
-@using RestaurantTraining.Blazor.Services
-@using RestaurantTraining.Blazor.Services.LearnerDashboardManagement
+@using RestaurantTraining.Web.Models
+@using RestaurantTraining.Web.Services
+@using RestaurantTraining.Web.Services.LearnerDashboardManagement
 @inject ILearnerDashboardService LearnerDashboardService
 @inject AuthState AuthState
 @inject NavigationManager Navigation
@@ -66,6 +66,11 @@
                             <div class="mod-card-body">
                                 <h3>@m.ModuleName</h3>
                                 <div class="progress-track"><div class="progress-fill" style="width:@(m.ProgressPercent)%"></div></div>
+                                @if (m.QuizPassed)
+                                {
+                                    <span class="mod-stage-badge"> Quiz passed </span>
+                                    <span class="mod-stage-badge">Practice scenario pending</span>
+                                }
                                 <div class="mod-card-footer">
                                     <span class="mod-percent">@m.ProgressPercent% complete</span>
                                     <button class="mod-btn continue" @onclick:stopPropagation="true" @onclick="() => Open(m.ModuleId)">Continue →</button>

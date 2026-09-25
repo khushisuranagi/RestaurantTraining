@@ -13,5 +13,6 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Commands.SubmitQui
         public bool CertificateIssued { get; set; }
         public string? CertificateNumber { get; set; }
         public string ModuleName { get; set; } = string.Empty;
+        public List<QuizAnswerReviewDto> Review { get; set; } = [];
     }
 }

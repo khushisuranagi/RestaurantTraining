@@ -20,7 +20,7 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Commands.SubmitQui
             CancellationToken cancellationToken)
         {
             var isAssigned = await _repository.IsAssignedToLearnerAsync(
-                request.RoleName, request.ModuleId, cancellationToken);
+                request.RoleName, request.UserId, request.ModuleId, cancellationToken);
 
             if (!isAssigned)
                 return new SubmitQuizOutcome { NotAssigned = true };
@@ -37,27 +37,40 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Commands.SubmitQui
             decimal totalMarks = 0, score = 0;
             int correctCount = 0;
 
+
+            var review = new List<QuizAnswerReviewDto>();
             foreach (var q in questions)
             {
                 totalMarks += q.Marks;
                 answers.TryGetValue(q.QuestionId, out var ans);
 
+                string correctAnswer;
                 bool isCorrect;
                 if (q.QuestionType == QuestionType.FillInTheBlank)
                 {
-                    var correctText = q.Options.FirstOrDefault(o => o.IsCorrect)?.OptionText ?? "";
+                    correctAnswer = q.Options.FirstOrDefault(o => o.IsCorrect)?.OptionText ?? "";
                     var given = ans?.TextAnswer?.Trim() ?? "";
                     isCorrect = given.Length > 0 &&
-                                string.Equals(given, correctText.Trim(), StringComparison.OrdinalIgnoreCase);
+                                string.Equals(given, correctAnswer.Trim(), StringComparison.OrdinalIgnoreCase);
                 }
                 else // MCQ or TrueFalse: selected set must exactly match the correct set
                 {
                     var correct = q.Options.Where(o => o.IsCorrect).Select(o => o.OptionId).ToHashSet();
                     var selected = (ans?.SelectedOptionIds ?? new()).ToHashSet();
                     isCorrect = selected.Count > 0 && selected.SetEquals(correct);
+                    correctAnswer = string.Join(", ",
+                        q.Options.Where(o => o.IsCorrect).Select(o => o.OptionText));
                 }
 
                 if (isCorrect) { score += q.Marks; correctCount++; }
+
+                review.Add(new QuizAnswerReviewDto
+                {
+                    QuestionText = q.QuestionText,
+                    IsCorrect = isCorrect,
+                    CorrectAnswer = correctAnswer,
+                    Explanation = q.Explanation
+                });
             }
 
             var percentage = totalMarks > 0 ? Math.Round(score / totalMarks * 100, 0) : 0;
@@ -91,7 +104,8 @@ namespace RestaurantTraining.Application.Features.LearnerQuiz.Commands.SubmitQui
                     TotalQuestions = questions.Count,
                     CertificateIssued = false,   // issued after the practice scenario
                     CertificateNumber = null,
-                    ModuleName = moduleName
+                    ModuleName = moduleName,
+                    Review = passed ? review : []
                 }
             };
         }

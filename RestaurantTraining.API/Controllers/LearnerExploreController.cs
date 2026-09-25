@@ -25,8 +25,11 @@ public class LearnerExploreController : ControllerBase
         var roleName = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         if (string.IsNullOrWhiteSpace(roleName)) return Forbid();
 
+        var userClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userClaim, out var userId)) return Forbid();
+
         var result = await _mediator.Send(
-            new GetExploreModulesQuery { RoleName = roleName });
+            new GetExploreModulesQuery { RoleName = roleName, UserId = userId });
 
         return Ok(result);
     }

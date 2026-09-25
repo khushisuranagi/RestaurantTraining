@@ -35,14 +35,24 @@ namespace RestaurantTraining.Persistence.Repositories
         public async Task<ModuleContentInfo?> GetAssignedModuleAsync(
             string roleName, int userId, int moduleId, CancellationToken cancellationToken)
         {
-            return await (
+            // Accessible if the module is assigned to the learner's role, OR the learner
+            // has self-enrolled from Explore (they have a ModuleProgress row for it).
+            var isAssigned = await (
                 from roleModule in _context.RoleModules
                 join role in _context.Roles on roleModule.RoleId equals role.RoleId
-                join trainingModule in _context.Modules on roleModule.ModuleId equals trainingModule.ModuleId
-                where role.RoleName == roleName
-                      && trainingModule.ModuleId == moduleId
-                      && trainingModule.IsActive
-                select new ModuleContentInfo
+                where role.RoleName == roleName && roleModule.ModuleId == moduleId
+                select roleModule
+            ).AnyAsync(cancellationToken);
+
+            var isEnrolled = await _context.ModuleProgress
+                .AnyAsync(mp => mp.UserId == userId && mp.ModuleId == moduleId, cancellationToken);
+
+            if (!isAssigned && !isEnrolled)
+                return null;
+
+            return await _context.Modules
+                .Where(trainingModule => trainingModule.ModuleId == moduleId && trainingModule.IsActive)
+                .Select(trainingModule => new ModuleContentInfo
                 {
                     ModuleId = trainingModule.ModuleId,
                     ModuleName = trainingModule.ModuleName,

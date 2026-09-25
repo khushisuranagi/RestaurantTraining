@@ -5,5 +5,6 @@ namespace RestaurantTraining.Application.Features.LearnerExplore.Queries.GetExpl
     public class GetExploreModulesQuery : IRequest<List<ExploreModuleDto>>
     {
         public string RoleName { get; set; } = string.Empty;
+        public int UserId { get; set; }
     }
 }

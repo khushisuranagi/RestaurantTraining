@@ -384,3 +384,12 @@
         color: #92400e;
         text-decoration: underline;
     }
+
+.outstanding-banner {
+    margin: 0 0 1.25rem;
+    padding: .8rem 1.1rem;
+    border-radius: 12px;
+    background: linear-gradient(90deg,#fde68a,#fbbf24);
+    color: #7c2d12;
+    font-weight: 700;
+}

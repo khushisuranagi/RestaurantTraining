@@ -1,4 +1,4 @@
-namespace RestaurantTraining.Blazor.Models;
+namespace RestaurantTraining.Web.Models;
 
 // One optional (unassigned) module in the Explore list.
 public class ExploreModuleModel

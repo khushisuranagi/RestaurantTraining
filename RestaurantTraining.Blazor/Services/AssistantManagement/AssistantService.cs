@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
-using RestaurantTraining.Blazor.Models;
+using RestaurantTraining.Web.Models;
 
-namespace RestaurantTraining.Blazor.Services.AssistantManagement;
+namespace RestaurantTraining.Web.Services.AssistantManagement;
 
 public class AssistantService : IAssistantService
 {

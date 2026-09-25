@@ -4,9 +4,10 @@ namespace RestaurantTraining.Application.Common.Interfaces
     // optional modules that are NOT assigned to the learner's role.
     public interface ILearnerExploreRepository
     {
-        // Active modules that are not assigned to the given role.
+        // Active modules that are not assigned to the given role and that the
+        // learner has not already started (self-enrolled).
         Task<List<ExploreModuleInfo>> GetUnassignedModulesAsync(
-            string roleName, CancellationToken cancellationToken);
+            string roleName, int userId, CancellationToken cancellationToken);
 
         // Lesson content for any active module (no role gate — read only).
         // Reuses the shared ModuleContentInfo shape. IsCompleted is always false

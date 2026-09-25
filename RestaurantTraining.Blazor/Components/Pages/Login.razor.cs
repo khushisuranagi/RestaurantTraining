@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
-using RestaurantTraining.Blazor.Models;
-using RestaurantTraining.Blazor.Services;
+using RestaurantTraining.Web.Models;
+using RestaurantTraining.Web.Services;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace RestaurantTraining.Blazor.Components.Pages;
+namespace RestaurantTraining.Web.Components.Pages;
 
 public partial class Login
 {

@@ -1,5 +1,5 @@
-using RestaurantTraining.Blazor.Models;
-namespace RestaurantTraining.Blazor.Services.DashboardManagement;
+using RestaurantTraining.Web.Models;
+namespace RestaurantTraining.Web.Services.DashboardManagement;
 
 
 public interface IDashboardService

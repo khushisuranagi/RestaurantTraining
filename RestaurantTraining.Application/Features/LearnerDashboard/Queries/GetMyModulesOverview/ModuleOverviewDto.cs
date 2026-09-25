@@ -8,6 +8,7 @@ namespace RestaurantTraining.Application.Features.LearnerDashboard.Queries.GetMy
         public string Description { get; set; } = string.Empty;
         public bool HasStarted { get; set; }
         public bool IsCompleted { get; set; }
+        public bool QuizPassed { get; set; }
         public int CompletedLessons { get; set; }
         public int TotalLessons { get; set; }
         public int ProgressPercent { get; set; }

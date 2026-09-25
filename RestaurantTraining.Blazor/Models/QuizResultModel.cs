@@ -1,4 +1,4 @@
-﻿namespace RestaurantTraining.Blazor.Models;
+﻿namespace RestaurantTraining.Web.Models;
 
 public class QuizResultModel
 {
@@ -12,4 +12,14 @@ public class QuizResultModel
     public bool CertificateIssued { get; set; }
     public string? CertificateNumber { get; set; }
     public string ModuleName { get; set; } = string.Empty;
+
+    public List<QuizAnswerReviewModel> Review { get; set; } = [];
+}
+
+public class QuizAnswerReviewModel
+{
+    public string QuestionText { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
+    public string CorrectAnswer { get; set; } = string.Empty;
+    public string Explanation { get; set; } = string.Empty;
 }

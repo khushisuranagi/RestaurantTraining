@@ -12,6 +12,19 @@ h1 { color: #12355b; margin: .25rem 0 .5rem; }
 .resource-pdf { height: 600px; }
 .resource-image { display: block; max-width: 100%; border-radius: 8px; }
 .muted { color: #64748b; font-style: italic; }
+
+.explore-cta {
+    margin-top: 1.25rem; padding: 1.25rem 1.4rem; border-radius: 12px;
+    background: #f7f9ff; border: 1px solid #dbe3f4;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.explore-cta-text { margin: 0; color: #334155; font-size: .95rem; line-height: 1.5; flex: 1; min-width: 260px; }
+.explore-start-btn {
+    flex-shrink: 0; border: none; background: #1c39bb; color: #fff;
+    padding: .7rem 1.4rem; border-radius: 10px; font-weight: 700; font-size: .95rem; cursor: pointer;
+    transition: background .2s ease;
+}
+.explore-start-btn:hover { background: #152d96; }
 @media (max-width: 700px) { .learning-module-page { padding: 1.25rem; } .resource-pdf { height: 450px; } }
 
 /* ---- Lesson progress + navigation ---- */
