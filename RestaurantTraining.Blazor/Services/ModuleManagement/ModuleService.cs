@@ -99,24 +99,25 @@ public class ModuleService : IModuleService
     }
 
 
-    public async Task<ApiResponse> DeleteModuleAsync(int moduleId)
+    public async Task<ApiResponse> DeleteModuleAsync(int moduleId, bool confirmCascade = false)
     {
         var response = await _http.DeleteAsync(
-            $"/api/Modules/{moduleId}");
-
-        if (!response.IsSuccessStatusCode)
+            $"/api/Modules/{moduleId}?confirm={confirmCascade.ToString().ToLowerInvariant()}");
+        try
         {
-            return new ApiResponse
-            {
-                Success = false,
-                Message = "Could not delete the module."
-            };
+            var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
+            if (body is not null) return body;
         }
+        catch { /* fall through */ }
 
-        return await ReadApiResponseAsync(
-            response,
-            "Module deleted successfully.");
+        return new ApiResponse
+        {
+            Success = response.IsSuccessStatusCode,
+            Message = response.IsSuccessStatusCode ? "Module deleted successfully." : "Could not delete the module."
+        };
     }
+
+        
 
 
     
@@ -463,6 +464,8 @@ public class ApiResponse
     public bool Success { get; set; }
 
     public string Message { get; set; } = string.Empty;
+    public bool RequiresConfirmation { get; set; }   
+    public int LessonCount { get; set; }
 }
 
 

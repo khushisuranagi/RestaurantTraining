@@ -27,5 +27,9 @@ namespace RestaurantTraining.Application.Common.Interfaces
     int moduleId,
     CancellationToken cancellationToken);
 
+        Task DeleteModuleWithChildrenAsync(
+    int moduleId,
+    CancellationToken cancellationToken);
+
     }
 }

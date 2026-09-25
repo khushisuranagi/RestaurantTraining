@@ -21,8 +21,7 @@ public interface IModuleService
         string? coverImageData = null,
     string? coverImageContentType = null);
 
-    Task<ApiResponse> DeleteModuleAsync(
-        int moduleId);
+    Task<ApiResponse> DeleteModuleAsync(int moduleId, bool confirmCascade = false);
 
 
     // Lessons

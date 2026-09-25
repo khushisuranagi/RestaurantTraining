@@ -880,34 +880,50 @@
 
             <div class="delete-form">
 
-                <div class="form-header">
-
-                    <div>
-
-                        <h2>Delete Module</h2>
-
-                        <p>
-                            Are you sure you want to delete
-                            "@moduleToDelete?.ModuleName"?
-                        </p>
-
+                @if (!cascadeConfirmNeeded)
+                {
+                    <div class="form-header">
+                        <div>
+                            <h2>Delete Module</h2>
+                            <p>
+                                Are you sure you want to delete
+                                "@moduleToDelete?.ModuleName"?
+                            </p>
+                        </div>
                     </div>
 
-                </div>
+                    <div class="form-actions">
+                        <button class="cancel-button" @onclick="CloseDeleteModuleModal">
+                            Cancel
+                        </button>
+                        <button class="confirm-delete-button" @onclick="DeleteModule">
+                            Delete
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-header">
+                        <div>
+                            <h2>Delete Module and its lessons?</h2>
+                            <p>
+                                ⚠️ "<strong>@moduleToDelete?.ModuleName</strong>" has
+                                <strong>@cascadeLessonCount</strong> lesson(s). Deleting it will also
+                                permanently remove all its lessons, resources, quizzes, scenarios and
+                                learner progress. This cannot be undone.
+                            </p>
+                        </div>
+                    </div>
 
-                <div class="form-actions">
-
-                    <button class="cancel-button"
-                            @onclick="CloseDeleteModuleModal">
-                        Cancel
-                    </button>
-
-                    <button class="confirm-delete-button"
-                            @onclick="DeleteModule">
-                        Delete
-                    </button>
-
-                </div>
+                    <div class="form-actions">
+                        <button class="cancel-button" @onclick="CloseDeleteModuleModal">
+                            Cancel
+                        </button>
+                        <button class="confirm-delete-button" @onclick="ConfirmCascadeDelete">
+                            Delete module and all lessons
+                        </button>
+                    </div>
+                }
 
             </div>
 

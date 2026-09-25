@@ -63,21 +63,18 @@ namespace RestaurantTraining.API.Controllers
             return Ok(response);
         }
 
-        // DELETE /api/Modules/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteModule(int id)
-        {
-            var command = new DeleteModuleCommand { ModuleId = id };
 
+        // DELETE /api/Modules/5?confirm=true
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteModule(int id, [FromQuery] bool confirm = false)
+        {
+            var command = new DeleteModuleCommand { ModuleId = id, ConfirmCascade = confirm };
             var response = await _mediator.Send(command);
 
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
-
-            return Ok(response);
+            // On !Success (including RequiresConfirmation) the body still carries the flags.
+            return response.Success ? Ok(response) : BadRequest(response);
         }
+
     }
 
 }

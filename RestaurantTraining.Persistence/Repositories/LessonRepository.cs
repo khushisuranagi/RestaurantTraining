@@ -55,13 +55,48 @@ namespace RestaurantTraining.Persistence.Repositories
         }
 
         public async Task DeleteLessonAsync(
-            Lesson lesson,
-            CancellationToken cancellationToken)
+    Lesson lesson,
+    CancellationToken cancellationToken)
         {
-            _context.Lessons.Remove(lesson);
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(cancellationToken);
 
-            await _context.SaveChangesAsync(
-                cancellationToken);
+            var resourceIds = await _context.LessonResources
+                .Where(r => r.LessonId == lesson.LessonId)
+                .Select(r => r.ResourceId)
+                .ToListAsync(cancellationToken);
+
+            // Per-resource AI content (no FK, but remove orphans)
+            await _context.ResourceQuestionAttempts
+                .Where(a => resourceIds.Contains(a.ResourceId))
+                .ExecuteDeleteAsync(cancellationToken);
+            await _context.ResourceQuestionOptions
+                .Where(o => _context.ResourceQuestions
+                    .Where(q => resourceIds.Contains(q.ResourceId))
+                    .Select(q => q.ResourceQuestionId)
+                    .Contains(o.ResourceQuestionId))
+                .ExecuteDeleteAsync(cancellationToken);
+            await _context.ResourceQuestions
+                .Where(q => resourceIds.Contains(q.ResourceId))
+                .ExecuteDeleteAsync(cancellationToken);
+            await _context.ResourceSummaries
+                .Where(s => resourceIds.Contains(s.ResourceId))
+                .ExecuteDeleteAsync(cancellationToken);
+
+            // Direct children of the lesson
+            await _context.LessonProgress
+                .Where(p => p.LessonId == lesson.LessonId)
+                .ExecuteDeleteAsync(cancellationToken);
+            await _context.LessonResources
+                .Where(r => r.LessonId == lesson.LessonId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            // The lesson itself
+            await _context.Lessons
+                .Where(l => l.LessonId == lesson.LessonId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
         }
     }
 }

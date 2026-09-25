@@ -56,6 +56,8 @@ public partial class ContentCreatorModules
     private bool moduleHasExistingImage;
 
 
+
+
     // STATUS DROPDOWN HELPERS
 
 
@@ -497,9 +499,10 @@ public partial class ContentCreatorModules
     }
 
 
-    
+
     // MODULE DELETE
-   
+    private bool cascadeConfirmNeeded;
+    private int cascadeLessonCount;
     private void OpenDeleteModuleModal(ModuleSummary module)
     {
         moduleToDelete = module;
@@ -511,35 +514,49 @@ public partial class ContentCreatorModules
     {
         moduleToDelete = null;
         showDeleteModuleModal = false;
+        cascadeConfirmNeeded = false;
+        cascadeLessonCount = 0;
     }
 
 
-    private async Task DeleteModule()
+    private async Task DeleteModule() => await DeleteModuleInternal(false);          // first click
+    private async Task ConfirmCascadeDelete() => await DeleteModuleInternal(true);   // "yes, delete lessons too"
+
+    private async Task DeleteModuleInternal(bool confirmCascade)
     {
-        if (moduleToDelete == null)
-            return;
+        if (moduleToDelete == null) return;
+
+        errorMessage = string.Empty;
 
         try
         {
-            var result =
-                await ModuleService.DeleteModuleAsync(
-                    moduleToDelete.ModuleId);
+            var result = await ModuleService.DeleteModuleAsync(moduleToDelete.ModuleId, confirmCascade);
+
+            if (result.RequiresConfirmation)      // module has lessons — escalate the modal
+            {
+                cascadeConfirmNeeded = true;
+                cascadeLessonCount = result.LessonCount;
+                StateHasChanged();                // make sure the warning re-renders
+                return;                           // keep modal open, show the warning
+            }
 
             if (!result.Success)
             {
                 errorMessage = result.Message;
+                StateHasChanged();
                 return;
             }
 
             CloseDeleteModuleModal();
-
             await LoadModules();
         }
-        catch
+        catch (Exception ex)
         {
-            errorMessage =
-                "Something went wrong while deleting the module.";
+            // Surface the real reason instead of hiding it.
+            errorMessage = $"Something went wrong while deleting the module: {ex.Message}";
         }
+
+        StateHasChanged();
     }
 
     private void HandleModuleImageSelected(InputFileChangeEventArgs e)
