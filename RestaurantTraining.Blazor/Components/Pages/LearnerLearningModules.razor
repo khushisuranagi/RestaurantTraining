@@ -23,9 +23,9 @@
     {
         <p class="eyebrow">TRAINING MODULE</p>
         <h1>@module.ModuleName</h1>
-        @if (totalPoints > 0)
+        @if (modulePoints > 0)
         {
-            <p class="points-badge">⭐ @totalPoints points</p>
+            <p class="points-badge">⭐ @modulePoints points earned in this module</p>
         }
         <p class="module-description">@module.Description</p>
 
@@ -236,7 +236,7 @@
     private Dictionary<int, ResourceAnswerResultModel?> answerResults = new();
     private HashSet<int> answeredCorrectly = new();
     private HashSet<int> submitting = new();
-    private int totalPoints;
+    private int modulePoints;   // points earned in THIS module only (not the global total)
 
     // Load the MCQ for each resource in the current lesson (once each).
     private async Task LoadQuestionsForCurrentLesson()
@@ -285,7 +285,8 @@
 
             if (result is not null)
             {
-                totalPoints = result.TotalPoints;
+                // Count only points earned in THIS module (0 if already answered).
+                modulePoints += result.PointsAwarded;
                 if (result.IsCorrect) answeredCorrectly.Add(resourceId);
             }
         }
@@ -326,6 +327,9 @@
 
             if (module is not null && module.Lessons.Count > 0)
             {
+                // Points earned in THIS module so far (starts at 0 for a fresh module).
+                modulePoints = await LearnerDashboardService.GetModulePointsAsync(ModuleId);
+
                 // Resume where the learner left off: the first lesson they haven't
                 // finished. If every lesson is already done (module is on the quiz/
                 // scenario stage), land on the LAST lesson so they get the "Take Quiz"

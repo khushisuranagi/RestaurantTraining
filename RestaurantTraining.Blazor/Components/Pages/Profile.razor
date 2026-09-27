@@ -29,6 +29,14 @@
                     <p class="profile-role">@profile.Role</p>
                 </div>
 
+                @if (!string.IsNullOrEmpty(awardLabel))
+                {
+                    <span class="award-badge award-@awardRank" title="@awardLabel Performance">
+                        <span class="award-medal">@AwardMedal()</span>
+                        <span class="award-text">@awardLabel</span>
+                    </span>
+                }
+
                 @if (!isEditing)
                 {
                     <button class="edit-btn" @onclick="StartEdit">Edit</button>
@@ -56,11 +64,6 @@
                     <div class="detail"><span class="detail-label">Member since</span><span class="detail-value">@profile.CreatedAt.ToString("MMMM d, yyyy")</span></div>
                     <div class="detail"><span class="detail-label">Last login</span><span class="detail-value">@(profile.LastLoginAt is null ? "—" : profile.LastLoginAt.Value.ToString("MMMM d, yyyy h:mm tt"))</span></div>
                 </div>
-
-                @if (isOutstanding)
-                {
-                    <span class="profile-award">🏆 Outstanding Performance</span>
-                }
             }
             else
             {

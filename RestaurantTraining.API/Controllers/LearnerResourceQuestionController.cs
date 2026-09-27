@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RestaurantTraining.Application.Features.ResourceQuestions.Commands.GetOrGenerateResourceQuestion;
 using RestaurantTraining.Application.Features.ResourceQuestions.Commands.SubmitResourceAnswer;
 using RestaurantTraining.Application.Features.ResourceSummaries.Commands.GetOrGenerateResourceSummary;
+using RestaurantTraining.Application.Features.ResourceQuestions.Queries.GetModulePoints;
 
 namespace RestaurantTraining.API.Controllers;
 
@@ -61,6 +62,23 @@ public class LearnerResourceQuestionController : ControllerBase
             return NotFound(new { Message = "No question is available for this resource." });
 
         return Ok(new { result.IsCorrect, result.Explanation, result.PointsAwarded, result.TotalPoints });
+    }
+
+    // GET /api/learner/resources/module/5/points
+    // Points the learner has earned from MCQs in THIS module only.
+    [HttpGet("module/{moduleId:int}/points")]
+    public async Task<IActionResult> GetModulePoints(int moduleId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Forbid();
+
+        var points = await _mediator.Send(new GetModulePointsQuery
+        {
+            UserId = userId.Value,
+            ModuleId = moduleId
+        });
+
+        return Ok(points);
     }
 
     // GET /api/learner/resources/5/summary

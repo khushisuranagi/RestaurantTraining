@@ -19,6 +19,8 @@ public interface ILearnerDashboardService
     Task<ResourceAnswerResultModel?> SubmitResourceAnswerAsync(int resourceId, int selectedOptionId);
 
     // AI summary of a lesson resource's content.
+    Task<int> GetModulePointsAsync(int moduleId);
+
     Task<string?> GetResourceSummaryAsync(int resourceId);
 
     // AI practice scenario.

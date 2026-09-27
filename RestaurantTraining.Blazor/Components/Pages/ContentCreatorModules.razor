@@ -113,7 +113,7 @@
                             @* Quiz moved to the "Quiz Management" section in the sidebar. *@
 
                             <button class="delete-button"
-                                    @onclick="() => OpenDeleteModuleModal(module)">
+                                    @onclick="async () => await OpenDeleteModuleModal(module)">
                                 Delete
                             </button>
 

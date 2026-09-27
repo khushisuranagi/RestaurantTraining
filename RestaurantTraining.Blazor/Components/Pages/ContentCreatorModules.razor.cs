@@ -503,9 +503,17 @@ public partial class ContentCreatorModules
     // MODULE DELETE
     private bool cascadeConfirmNeeded;
     private int cascadeLessonCount;
-    private void OpenDeleteModuleModal(ModuleSummary module)
+    private async Task OpenDeleteModuleModal(ModuleSummary module)
     {
         moduleToDelete = module;
+        errorMessage = string.Empty;
+
+        // Decide up front which question to show: if the module has lessons, go
+        // straight to the cascade warning; if it has none, show the simple confirm.
+        var allLessons = await ModuleService.GetLessonsAsync();
+        cascadeLessonCount = allLessons.Count(l => l.ModuleId == module.ModuleId);
+        cascadeConfirmNeeded = cascadeLessonCount > 0;
+
         showDeleteModuleModal = true;
     }
 

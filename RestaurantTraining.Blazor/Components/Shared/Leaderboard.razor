@@ -27,9 +27,9 @@
                         @e.FullName
                         <small class="lb-role">@e.RoleName</small>
                     </span>
-                    @if (e.IsOutstanding)
+                    @if (!string.IsNullOrEmpty(e.AwardLabel))
                     {
-                        <span class="lb-award">Outstanding Performance</span>
+                        <span class="lb-award award-@e.Rank">@e.AwardLabel Performance</span>
                     }
                     <span class="lb-points">@e.Points pts</span>
                 </li>

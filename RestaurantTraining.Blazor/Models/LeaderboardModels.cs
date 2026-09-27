@@ -13,4 +13,13 @@ public class LeaderboardEntryModel
     public string RoleName { get; set; } = string.Empty;
     public int Points { get; set; }
     public bool IsOutstanding { get; set; }
+
+    // Rank-based award label: 1st = Outstanding, 2nd = Excellent, 3rd = Good.
+    public string AwardLabel => Rank switch
+    {
+        1 => "Outstanding",
+        2 => "Excellent",
+        3 => "Good",
+        _ => string.Empty
+    };
 }

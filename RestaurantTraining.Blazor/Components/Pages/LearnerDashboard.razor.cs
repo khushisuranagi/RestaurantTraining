@@ -19,6 +19,7 @@ public partial class LearnerDashboard
 
     private bool isOutstanding;
     private int myRank;
+    private string awardLabel = string.Empty;
 
     
     
@@ -37,7 +38,7 @@ public partial class LearnerDashboard
         {
             dashboard = await LearnerDashboardService.GetDashboardAsync();
             var lb = await LeaderboardService.GetLeaderboardAsync();
-            if (lb?.Me is not null) { isOutstanding = lb.Me.IsOutstanding; myRank = lb.Me.Rank; }
+            if (lb?.Me is not null) { isOutstanding = lb.Me.IsOutstanding; myRank = lb.Me.Rank; awardLabel = lb.Me.AwardLabel; }
         }
         finally
         {

@@ -71,13 +71,50 @@
 }
 .logout-btn:hover { background:#fef2f2; }
 
-.profile-award {
-    display: inline-block;
-    margin-top: .5rem;
-    padding: .3rem .8rem;
+/* Award badge in the profile header (sits just left of the Edit button) */
+.award-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;       /* pushes it to the right, next to Edit */
+    padding: .5rem .5rem .5rem .55rem;
     border-radius: 999px;
-    background: #f59e0b;
-    color: #fff;
-    font-weight: 700;
-    font-size: .8rem;
+    font-weight: 800;
+    font-size: .82rem;
+    letter-spacing: .01em;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, .55);
+    /* soft outer drop + inner top highlight = a raised medal look */
+    box-shadow: 0 4px 10px rgba(15, 23, 42, .18), inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+
+/* The medal sits in its own little disc so it reads as a pinned medal */
+.award-badge .award-medal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .65);
+    font-size: 1rem;
+    line-height: 1;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .8);
+}
+.award-badge .award-text { padding-right: .35rem; }
+
+/* Gold — Outstanding (rank 1) */
+.award-badge.award-1 {
+    background: linear-gradient(135deg, #fef3c7, #fbbf24 55%, #d97706);
+    color: #7c2d12;
+}
+/* Silver — Excellent (rank 2) */
+.award-badge.award-2 {
+    background: linear-gradient(135deg, #f8fafc, #cbd5e1 55%, #94a3b8);
+    color: #334155;
+}
+/* Bronze — Good (rank 3) */
+.award-badge.award-3 {
+    background: linear-gradient(135deg, #f5d0a9, #d08b4f 55%, #a05a1f);
+    color: #5a2d0c;
 }

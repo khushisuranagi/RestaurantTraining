@@ -28,6 +28,9 @@ namespace RestaurantTraining.Application.Common.Interfaces
 
         // The learner's total points from resource questions.
         Task<int> GetTotalPointsAsync(int userId, CancellationToken cancellationToken);
+
+        // Points the learner has earned from MCQs within a single module only.
+        Task<int> GetModulePointsAsync(int userId, int moduleId, CancellationToken cancellationToken);
     }
 
     public class ResourceContextInfo

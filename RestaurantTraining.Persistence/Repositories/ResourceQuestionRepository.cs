@@ -151,5 +151,20 @@ namespace RestaurantTraining.Persistence.Repositories
                 .Where(a => a.UserId == userId)
                 .SumAsync(a => (int?)a.PointsAwarded, cancellationToken) ?? 0;
         }
+
+        // Sum of points from MCQs whose resource belongs to this module only.
+        public async Task<int> GetModulePointsAsync(
+            int userId, int moduleId, CancellationToken cancellationToken)
+        {
+            return await (
+                from attempt in _context.ResourceQuestionAttempts
+                join resource in _context.LessonResources
+                    on attempt.ResourceId equals resource.ResourceId
+                join lesson in _context.Lessons
+                    on resource.LessonId equals lesson.LessonId
+                where attempt.UserId == userId && lesson.ModuleId == moduleId
+                select (int?)attempt.PointsAwarded
+            ).SumAsync(cancellationToken) ?? 0;
+        }
     }
 }

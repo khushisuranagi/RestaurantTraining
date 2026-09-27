@@ -32,6 +32,17 @@ public partial class Profile
     private bool isSuccess;
 
     private bool isOutstanding;   // top-3 on the leaderboard
+    private string awardLabel = string.Empty;   // Outstanding / Excellent / Good
+    private int awardRank;        // 1, 2 or 3 — drives the badge colour
+
+    // Medal emoji for the award badge.
+    private string AwardMedal() => awardRank switch
+    {
+        1 => "🥇",
+        2 => "🥈",
+        3 => "🥉",
+        _ => string.Empty
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,6 +55,8 @@ public partial class Profile
             // Show the "Outstanding Performance" badge if this learner is top 3.
             var leaderboard = await LeaderboardService.GetLeaderboardAsync();
             isOutstanding = leaderboard?.Me?.IsOutstanding ?? false;
+            awardLabel = leaderboard?.Me?.AwardLabel ?? string.Empty;
+            awardRank = leaderboard?.Me?.Rank ?? 0;
         }
         finally
         {

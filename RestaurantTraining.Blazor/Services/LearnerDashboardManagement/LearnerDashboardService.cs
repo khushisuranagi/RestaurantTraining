@@ -95,6 +95,12 @@ public class LearnerDashboardService : ILearnerDashboardService
             : null;
     }
 
+    public async Task<int> GetModulePointsAsync(int moduleId)
+    {
+        return await _http.GetFromJsonAsync<int>(
+            $"/api/learner/resources/module/{moduleId}/points");
+    }
+
     public async Task<string?> GetResourceSummaryAsync(int resourceId)
     {
         var response = await _http.GetAsync($"/api/learner/resources/{resourceId}/summary");

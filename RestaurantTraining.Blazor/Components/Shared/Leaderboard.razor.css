@@ -79,6 +79,11 @@
     white-space: nowrap;
 }
 
+/* Distinct colours per rank: gold / silver / bronze */
+.lb-award.award-1 { background: #f59e0b; }   /* Outstanding — gold  */
+.lb-award.award-2 { background: #94a3b8; }   /* Excellent   — silver */
+.lb-award.award-3 { background: #b45309; }   /* Good        — bronze */
+
 .lb-points {
     flex-shrink: 0;
     font-weight: 700;
