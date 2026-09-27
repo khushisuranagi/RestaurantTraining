@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/RestaurantTraining/" />
   <Folder Name="/src/RestaurantTraining/API/">
