@@ -45,6 +45,14 @@
                 <span class="lb-points">@data.Me.Points pts</span>
             </div>
         }
+
+        @* Motivational footer with the learner's current rank *@
+        @if (ShowYourRank && data.Me is not null)
+        {
+            <div class="lb-motivation">
+                You're currently at <strong>rank #@data.Me.Rank.ToString("D2")</strong> — @MotivationFor(data.Me.Rank)
+            </div>
+        }
     }
 </div>
 
@@ -66,5 +74,12 @@
         2 => "🥈",
         3 => "🥉",
         _ => $"#{rank}"
+    };
+
+    private static string MotivationFor(int rank) => rank switch
+    {
+        1 => "you're at the very top, incredible work! 🎉",
+        2 or 3 => "so close to the top, keep it up! 💪",
+        _ => "keep going, you're climbing! 🚀"
     };
 }

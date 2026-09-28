@@ -64,6 +64,14 @@
     margin-bottom: 2rem;
 }
 
+/* Hover effect */
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .10);
+    border-color: #d6e0ff;
+    background-color: #e7ecff
+}
+
 .stat-card,
 .dashboard-section {
     padding: 1.25rem;

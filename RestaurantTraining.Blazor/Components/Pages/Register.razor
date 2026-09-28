@@ -130,6 +130,15 @@
             message = "Please complete all required fields and choose a role.";
             return;
         }
+
+        // Phone is optional, but if entered it must be exactly 10 digits.
+        if (!string.IsNullOrWhiteSpace(phoneNumber) &&
+            !System.Text.RegularExpressions.Regex.IsMatch(phoneNumber.Trim(), @"^\d{10}$"))
+        {
+            message = "Phone number is not valid — it must be exactly 10 digits.";
+            return;
+        }
+
         isLoading = true;
         try
         {

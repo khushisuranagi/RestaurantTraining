@@ -2,6 +2,7 @@
 @inject AuthState AuthState
 @inject NavigationManager Navigation
 @inject HttpClient Http
+@using RestaurantTraining.Web.Components.Shared
 
 <div class="page">
     <div class="sidebar">
@@ -54,6 +55,11 @@
 @if (showMenu)
 {
     <div class="dropdown-overlay" @onclick="CloseMenu"></div>
+}
+
+@if (AuthState.IsLoggedIn)
+{
+    <AiChatWidget />
 }
 
 <div id="blazor-error-ui" data-nosnippet>

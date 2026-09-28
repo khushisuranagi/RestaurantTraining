@@ -206,12 +206,14 @@
     padding: 40px 20px;
     background: rgba(15, 23, 42, 0.45);
     overflow-y: auto;
-    z-index: 1000;
+    z-index: 1100; /* above the top bar (1001) so it no longer overlaps */
 }
 
 .module-form {
     width: 100%;
     max-width: 520px;
+    max-height: calc(100vh - 80px); /* never taller than the screen */
+    overflow-y: auto;               /* scroll the form itself if content is long */
     padding: 28px;
     background: #ffffff;
     border-radius: 14px;

@@ -171,6 +171,13 @@
         font-weight: 700;
         color: #1a2340;
         margin: 0;
+        line-height: 1.3;
+        /* Reserve 2 lines so short and long titles align the content below */
+        min-height: 2.6em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
 .mod-desc {

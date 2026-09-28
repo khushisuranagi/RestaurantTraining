@@ -104,3 +104,15 @@
     .lb-you .lb-name {
         color: #1c39bb;
     }
+
+.lb-motivation {
+    margin-top: 14px;
+    padding: .8rem 1rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    border: 1px solid #c7d2fe;
+    color: #3730a3;
+    font-size: .92rem;
+    text-align: center;
+}
+.lb-motivation strong { color: #1c39bb; }
